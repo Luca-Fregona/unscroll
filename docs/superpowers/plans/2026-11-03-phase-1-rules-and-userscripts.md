@@ -179,7 +179,7 @@ git commit -m "feat: rule set types, JSON schema and schema validation"
 **Interfaces:**
 - Consumes: `validateRuleSet` from Task 1. The signature does not change. The checks below run **only when schema validation passed**, and every failed check adds one error.
 
-- [ ] **Step 1: Write the failing tests** (append to `core/validate.test.ts`)
+- [x] **Step 1: Write the failing tests** (append to `core/validate.test.ts`)
 
 ```ts
 describe("validateRuleSet — semantics", () => {
@@ -207,22 +207,22 @@ describe("validateRuleSet — semantics", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run core/validate.test.ts`. Expected: the 5 new tests FAIL, because each result comes back `ok: true`.
 
-- [ ] **Step 3: Implement the checks in `core/validate.ts`**
+- [x] **Step 3: Implement the checks in `core/validate.ts`**
 
 - **Ids:** collect ids from `web.redirects`, `web.hide` and `android.rules`, and report each repeated id once.
 - **Regex:** `new RegExp(from)` inside a try/catch.
 - **Loop:** `new RegExp(from).test(new URL(to, "https://unscroll.invalid").pathname)`. Skip this check when the regex is invalid.
 - **Selectors:** `parse(selector)` from `css-what`. If it throws, the selector is invalid. If `.length !== 1`, the selector is a comma list.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run core/validate.test.ts`. Expected: 11 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git commit -am "feat: semantic rule checks (ids, regex, loops, selectors)"`
 

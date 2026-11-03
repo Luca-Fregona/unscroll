@@ -39,3 +39,39 @@ describe("validateRuleSet — schema", () => {
     expect(validateRuleSet(d).ok).toBe(false);
   });
 });
+
+describe("validateRuleSet — semantics", () => {
+  const fail = (errors: string[]) => ({ ok: false, errors });
+
+  it("rejects duplicate rule ids across sections", () => {
+    const d = clone();
+    d.web.hide[0].id = "feed-to-home";
+    expect(validateRuleSet(d)).toEqual(fail(['duplicate rule id "feed-to-home"']));
+  });
+
+  it("rejects an invalid redirect regex", () => {
+    const d = clone();
+    d.web.redirects[0].from = "^/feed(";
+    expect(validateRuleSet(d)).toEqual(fail(['redirect "feed-to-home": invalid regex']));
+  });
+
+  it("rejects a redirect whose target matches its own pattern", () => {
+    const d = clone();
+    d.web.redirects[0].from = "^/";
+    expect(validateRuleSet(d)).toEqual(
+      fail(['redirect "feed-to-home": target matches its own pattern (loop)']),
+    );
+  });
+
+  it("rejects an invalid CSS selector", () => {
+    const d = clone();
+    d.web.hide[0].selector = "a[href=";
+    expect(validateRuleSet(d)).toEqual(fail(['hide "feed-link": invalid selector']));
+  });
+
+  it("rejects a comma-separated selector list", () => {
+    const d = clone();
+    d.web.hide[0].selector = "a, b";
+    expect(validateRuleSet(d)).toEqual(fail(['hide "feed-link": use one selector per rule']));
+  });
+});
