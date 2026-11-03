@@ -238,7 +238,7 @@ Run: `npx vitest run core/validate.test.ts`. Expected: 11 passed.
 - Consumes: `validateRuleSet`, `RuleSet`
 - Produces: `loadRuleSets(dir: string): Promise<RuleSet[]>`, sorted by `id`. It reads only `*.json` directly inside `dir` and never recurses. On any failure it throws `class RuleSetLoadError extends Error { errors: string[] }`, and every message starts with `<file name>: `.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Use `fs.mkdtemp(path.join(os.tmpdir(), "unscroll-"))` for each test, plus a helper `rs(id)` that returns the fixture with that `id`.
 
@@ -263,19 +263,19 @@ it("prefixes validation errors with the file name", async () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run core/load.test.ts`. Expected: FAIL, because the module is not found.
 
-- [ ] **Step 3: Implement `loadRuleSets`, `RuleSetLoadError` and the CLI**
+- [x] **Step 3: Implement `loadRuleSets`, `RuleSetLoadError` and the CLI**
 
 The CLI takes the directory from `process.argv[2]`. On success it prints `✓ <n> rule sets valid` and exits 0. On a `RuleSetLoadError` it prints `✗ <error>` per line and exits 1.
 
-- [ ] **Step 4: Run the tests and the CLI**
+- [x] **Step 4: Run the tests and the CLI**
 
 Run: `npx vitest run core/load.test.ts && npm run validate`. Expected: 4 passed, then `✓ 0 rule sets valid`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add core && git commit -m "feat: load and validate rules directory"`
 
