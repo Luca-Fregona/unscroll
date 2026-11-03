@@ -3,6 +3,7 @@ import groovy.json.JsonSlurper
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
 }
 
 // The version and the repo URL live in package.json only (see CLAUDE.md).
@@ -50,7 +51,7 @@ abstract class VerifyNoInternetTask : DefaultTask() {
 
 android {
     namespace = "io.github.lucafregona.unscroll"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "io.github.lucafregona.unscroll"
@@ -105,6 +106,10 @@ androidComponents {
 
 dependencies {
     implementation(libs.kotlinx.serialization.json)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.activity.compose)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.test.ext.junit)

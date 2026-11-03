@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="disclosure_network">This version has no internet access at all. You can import rule files by hand.</string>
+</resources>

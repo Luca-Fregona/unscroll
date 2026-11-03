@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="disclosure_network">This version downloads rule files from the web address shown in the app, and nothing else. You can change that address or import a file by hand.</string>
+</resources>
