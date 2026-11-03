@@ -22,6 +22,7 @@ const target = () => `${location.origin}/watch?v=dQw4w9WgXcQ`;
 beforeEach(() => {
   history.replaceState({}, "", "/");
   document.getElementById("unscroll-t")?.remove();
+  if (!document.documentElement) document.appendChild(document.createElement("html"));
   if (!document.head) document.documentElement.prepend(document.createElement("head"));
 });
 afterEach(() => vi.useRealTimers());
@@ -55,6 +56,15 @@ it("redirects after an in-page navigation", () => {
 it("falls back to <html> when <head> does not exist yet", () => {
   document.head.remove();
   const stop = run(ruleSet, { win: window, navigate: vi.fn() });
+  expect(document.getElementById("unscroll-t")?.parentElement).toBe(document.documentElement);
+  stop();
+});
+
+it("waits for <html> when the document is still empty (document-start in Chromium)", async () => {
+  document.removeChild(document.documentElement);
+  const stop = run(ruleSet, { win: window, navigate: vi.fn() });
+  document.appendChild(document.createElement("html"));
+  await Promise.resolve();
   expect(document.getElementById("unscroll-t")?.parentElement).toBe(document.documentElement);
   stop();
 });

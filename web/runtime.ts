@@ -20,11 +20,7 @@ export function run(ruleSet: RuleSet, env: RuntimeEnv): () => void {
     return () => {};
   }
 
-  const doc = env.win.document;
-  const style = doc.createElement("style");
-  style.id = `unscroll-${ruleSet.id}`;
-  style.textContent = buildHideCss(web.hide);
-  (doc.head ?? doc.documentElement).appendChild(style);
+  injectStyle(env.win, `unscroll-${ruleSet.id}`, buildHideCss(web.hide));
 
   return watchUrl(
     env.win,
@@ -34,4 +30,29 @@ export function run(ruleSet: RuleSet, env: RuntimeEnv): () => void {
     },
     env.intervalMs,
   );
+}
+
+/**
+ * At document-start the document can still be empty (Chromium has no <html> yet),
+ * so wait for the first element that can hold a <style>.
+ */
+function injectStyle(win: Window, id: string, css: string): void {
+  const doc = win.document;
+  const style = doc.createElement("style");
+  style.id = id;
+  style.textContent = css;
+
+  const parent = () => doc.head ?? doc.documentElement;
+  const existing = parent();
+  if (existing) {
+    existing.appendChild(style);
+    return;
+  }
+  const observer = new MutationObserver(() => {
+    const ready = parent();
+    if (!ready) return;
+    observer.disconnect();
+    ready.appendChild(style);
+  });
+  observer.observe(doc, { childList: true, subtree: true });
 }

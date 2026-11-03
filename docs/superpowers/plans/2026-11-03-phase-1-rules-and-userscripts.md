@@ -404,7 +404,7 @@ it("reports popstate without waiting for the timer", () => {
   export interface RuntimeEnv { win: Window; navigate: (href: string) => void; intervalMs?: number }
   export function run(ruleSet: RuleSet, env: RuntimeEnv): () => void
   ```
-  When there is no `web` target, it returns a no-op. When the current URL redirects, it calls `navigate(target)` once, injects nothing, and returns a no-op. Otherwise it injects `<style id="unscroll-<id>">` into `document.head ?? document.documentElement`, then watches the URL and calls `navigate` whenever a navigation resolves to a redirect. The returned function stops the watcher.
+  When there is no `web` target, it returns a no-op. When the current URL redirects, it calls `navigate(target)` once, injects nothing, and returns a no-op. Otherwise it injects `<style id="unscroll-<id>">` into `document.head ?? document.documentElement`, waiting with a `MutationObserver` when neither exists yet (Chromium at document-start), then watches the URL and calls `navigate` whenever a navigation resolves to a redirect. The returned function stops the watcher.
 
 - [x] **Step 1: Write the failing tests**
 
@@ -543,7 +543,7 @@ Run: `npx vitest run rules/rules.test.ts && npm run validate`. Expected: 6 passe
   export function buildUserscripts(opts: BuildOptions): Promise<string[]> // written paths, sorted
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // header.test.ts
@@ -574,11 +574,11 @@ it("writes one parseable, offline userscript per web rule set", async () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run web/build`. Expected: FAIL, because the modules are not found.
 
-- [ ] **Step 3: Implement the header, the build and the CLI**
+- [x] **Step 3: Implement the header, the build and the CLI**
 
 **Header lines,** in this order, each written as `` `// ${("@" + key).padEnd(13)}${value}` ``:
 `name` (`unscroll — <name>`), `namespace` (repoUrl), `version`, `description`, `match` (one line per pattern), `run-at document-start`, `grant none`, `updateURL` and `downloadURL` (both `<repoUrl>/releases/latest/download/unscroll-<id>.user.js`), `license GPL-3.0-or-later`.
@@ -592,7 +592,7 @@ Write the result to `outDir`.
 
 **CLI:** reads `version` and `repository.url` from `package.json`, builds `rules` into `dist`, and prints `built <n> userscripts` followed by the paths.
 
-- [ ] **Step 4: Run the tests and the build**
+- [x] **Step 4: Run the tests and the build**
 
 Run: `npx vitest run web/build && npm run build`. Expected: 2 passed, then `built 2 userscripts`.
 
@@ -602,7 +602,7 @@ Run: `npx vitest run web/build && npm run build`. Expected: 2 passed, then `buil
 - **iPhone:** install "Userscripts" from the App Store and enable it in Safari for youtube.com and instagram.com. Put both files in its folder in the Files app and repeat the checks.
 - For each selector that matched nothing, update it in the rule file and bump `version`. Re-run `npm run validate && npm test`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 `git add web/build rules && git commit -m "feat: userscript build"`
 
