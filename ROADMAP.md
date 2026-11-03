@@ -19,7 +19,8 @@ Plan: [`2026-11-03-phase-1-rules-and-userscripts.md`](docs/superpowers/plans/202
 - [ ] Tag `v0.1.0`
 
 ## Phase 2: Android client → v0.2
-- [ ] Write the Phase 2 plan
+Plan: [`2026-11-03-phase-2-android-client.md`](docs/superpowers/plans/2026-11-03-phase-2-android-client.md)
+- [x] Write the Phase 2 plan
 - [ ] Dump the UI trees of Instagram and YouTube (`adb shell uiautomator dump`) and write the `android` blocks in the rule sets
 - [ ] Kotlin `AccessibilityService` scoped to the target packages: Back, Home, overlay, cooldown
 - [ ] In-app disclosure screen, and an onboarding flow for Android 13+ restricted settings
