@@ -22,6 +22,12 @@
         "description": "Feed screen",
         "when": { "viewId": "com.example.app:id/feed_pager" },
         "action": "back"
+      },
+      {
+        "id": "feed-tab",
+        "description": "Feed tab is selected",
+        "when": { "viewId": "com.example.app:id/feed_tab", "selected": true },
+        "action": "back"
       }
     ]
   }
