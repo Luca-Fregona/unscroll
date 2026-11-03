@@ -291,7 +291,7 @@ Run: `npx vitest run core/load.test.ts && npm run validate`. Expected: 4 passed,
 - Consumes: `RedirectRule`
 - Produces: `resolveRedirect(rules: RedirectRule[], href: string): string | null`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 const rules: RedirectRule[] = [
@@ -312,19 +312,19 @@ it("returns null when nothing matches", () => expect(go("https://www.youtube.com
 it("never redirects a page to itself", () => expect(go("https://www.instagram.com/")).toBeNull());
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run web/engine/redirect.test.ts`. Expected: FAIL, because the module is not found.
 
-- [ ] **Step 3: Implement it**
+- [x] **Step 3: Implement it**
 
 The first rule whose `from` matches `url.pathname` decides, and no later rules are tried. The target path is `rule.to.replace(/\$([1-9])/g, (_, i) => match[Number(i)] ?? "")`. Do **not** use `pathname.replace`, because that would keep any trailing path. The result is `new URL(target, url.origin).href`, or `null` if that equals `href`.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Expected: 5 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add web/engine && git commit -m "feat: redirect resolution"`
 
