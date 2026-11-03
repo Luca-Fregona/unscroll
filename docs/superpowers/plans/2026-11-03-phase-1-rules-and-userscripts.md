@@ -406,7 +406,7 @@ it("reports popstate without waiting for the timer", () => {
   ```
   When there is no `web` target, it returns a no-op. When the current URL redirects, it calls `navigate(target)` once, injects nothing, and returns a no-op. Otherwise it injects `<style id="unscroll-<id>">` into `document.head ?? document.documentElement`, then watches the URL and calls `navigate` whenever a navigation resolves to a redirect. The returned function stops the watcher.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // @vitest-environment jsdom
@@ -445,7 +445,7 @@ it("falls back to <html> when <head> does not exist yet", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 4 passed. Then **Step 5:** commit with `feat: page runtime`.
+- [x] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 4 passed. Then **Step 5:** commit with `feat: page runtime`.
 
 ---
 
