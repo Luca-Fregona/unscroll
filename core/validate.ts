@@ -27,19 +27,25 @@ function duplicateIds(ruleSet: RuleSet): string[] {
   return [...repeated].map((id) => `duplicate rule id "${id}"`);
 }
 
+/** Every redirect target must be final: no rule, including its own, may redirect it again. */
 function redirectErrors(ruleSet: RuleSet): string[] {
   const errors: string[] = [];
+  const compiled: Array<{ id: string; to: string; pattern: RegExp }> = [];
   for (const rule of ruleSet.web?.redirects ?? []) {
-    let pattern: RegExp;
     try {
-      pattern = new RegExp(rule.from);
+      compiled.push({ id: rule.id, to: rule.to, pattern: new RegExp(rule.from) });
     } catch {
       errors.push(`redirect "${rule.id}": invalid regex`);
+    }
+  }
+  for (const rule of compiled) {
+    const targetPath = new URL(rule.to, "https://unscroll.invalid").pathname;
+    if (rule.pattern.test(targetPath)) {
+      errors.push(`redirect "${rule.id}": target matches its own pattern (loop)`);
       continue;
     }
-    if (pattern.test(new URL(rule.to, "https://unscroll.invalid").pathname)) {
-      errors.push(`redirect "${rule.id}": target matches its own pattern (loop)`);
-    }
+    const other = compiled.find((candidate) => candidate !== rule && candidate.pattern.test(targetPath));
+    if (other) errors.push(`redirect "${rule.id}": target matches redirect "${other.id}" (chain)`);
   }
   return errors;
 }

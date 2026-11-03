@@ -75,3 +75,17 @@ describe("validateRuleSet — semantics", () => {
     expect(validateRuleSet(d)).toEqual(fail(['hide "feed-link": use one selector per rule']));
   });
 });
+
+describe("validateRuleSet — redirect chains", () => {
+  it("rejects redirects whose targets another redirect would catch", () => {
+    const d = clone();
+    d.web.redirects.push({ id: "home-to-feed", description: "Loops back", from: "^/$", to: "/feed/" });
+    expect(validateRuleSet(d)).toEqual({
+      ok: false,
+      errors: [
+        'redirect "feed-to-home": target matches redirect "home-to-feed" (chain)',
+        'redirect "home-to-feed": target matches redirect "feed-to-home" (chain)',
+      ],
+    });
+  });
+});
