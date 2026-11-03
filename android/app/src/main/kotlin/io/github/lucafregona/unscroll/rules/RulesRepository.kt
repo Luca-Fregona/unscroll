@@ -58,6 +58,13 @@ class RulesRepository(bundledJson: List<String>, private val storeDir: File) {
         return ImportResult.Stored(ruleSet.id, ruleSet.version)
     }
 
+    /** Forgets everything that was imported or fetched, so only the bundled rule sets remain. */
+    @Synchronized
+    fun resetStored() {
+        storeDir.listFiles().orEmpty().forEach { it.delete() }
+        cache = null
+    }
+
     private fun load(): List<AndroidRuleSet> {
         val candidates = bundled.map { it to false } + stored().map { it to true }
         return candidates.groupBy { (ruleSet, _) -> ruleSet.id }.values

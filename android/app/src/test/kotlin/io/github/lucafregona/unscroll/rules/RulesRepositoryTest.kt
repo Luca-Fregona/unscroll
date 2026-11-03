@@ -106,6 +106,15 @@ class RulesRepositoryTest {
     }
 
     @Test
+    fun resetStoredBringsBackTheBundledRules() {
+        repo.import(ruleSetJson("youtube", YOUTUBE, version = "2026.12.01", testedVersion = "imported"))
+        assertEquals("imported", repo.youtube().testedVersion)
+        repo.resetStored()
+        assertEquals("bundled", repo.youtube().testedVersion)
+        assertTrue(store.listFiles().orEmpty().isEmpty())
+    }
+
+    @Test
     fun anImportedRuleSetSurvivesANewRepository() {
         repo.import(ruleSetJson("youtube", YOUTUBE, version = "2026.12.01", testedVersion = "imported"))
         assertEquals("imported", RulesRepository(bundled, store).youtube().testedVersion)
