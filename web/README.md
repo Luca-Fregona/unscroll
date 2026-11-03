@@ -16,6 +16,13 @@ Your script manager updates installed scripts automatically from the same links.
 3. Open an install link above in Safari, tap the Userscripts button in the address bar, and confirm the install.
 4. Use YouTube and Instagram in Safari, at `m.youtube.com` and `instagram.com`. Optionally, remove the apps or put them behind a Screen Time limit, so you don't open them out of habit.
 
+### Shortcuts on the Home Screen
+
+Safari extensions do not run in Home Screen web apps, so a plain "Add to Home Screen" shortcut shows Shorts again. If Chrome is your default browser, or the YouTube and Instagram apps open instead of Safari, use one of these:
+
+- **Shortcuts app:** create a shortcut with the *Open URL* action and the address `x-safari-https://m.youtube.com` (or `x-safari-https://www.instagram.com`), then add it to the Home Screen. The `x-safari-` prefix forces Safari.
+- **Safari Favorites:** open the site in Safari and use Share → Add to Favorites. It appears on Safari's start page.
+
 ## Desktop
 
 Install **Violentmonkey** or **Tampermonkey** in your browser, then open an install link above and confirm.
