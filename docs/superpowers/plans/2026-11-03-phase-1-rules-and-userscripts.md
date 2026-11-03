@@ -363,7 +363,7 @@ it("emits one block per rule so a bad selector only drops itself", () =>
 **Interfaces:**
 - Produces: `watchUrl(win: Window, onChange: (href: string) => void, intervalMs = 300): () => void`. It calls `onChange` only when `win.location.href` differs from the last value it saw. It checks on a `win.setInterval` tick and on `popstate`. The returned function stops both.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 // @vitest-environment jsdom
@@ -387,7 +387,7 @@ it("reports popstate without waiting for the timer", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 2 passed. Then **Step 5:** commit with `feat: SPA url watcher`.
+- [x] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 2 passed. Then **Step 5:** commit with `feat: SPA url watcher`.
 
 ---
 
