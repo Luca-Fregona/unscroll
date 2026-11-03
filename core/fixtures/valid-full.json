@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "example",
+  "name": "Example",
+  "description": "Fixture covering every field.",
+  "version": "2026.11.03",
+  "web": {
+    "matches": ["*://www.example.com/*", "*://*.example.org/*"],
+    "redirects": [
+      { "id": "feed-to-home", "description": "Feed goes home", "from": "^/feed(/|$)", "to": "/" }
+    ],
+    "hide": [
+      { "id": "feed-link", "description": "Feed nav link", "selector": "a[href=\"/feed/\"]" }
+    ]
+  },
+  "android": {
+    "package": "com.example.app",
+    "testedVersion": "1.2.3",
+    "rules": [
+      {
+        "id": "feed-screen",
+        "description": "Feed screen",
+        "when": { "viewId": "com.example.app:id/feed_pager" },
+        "action": "back"
+      }
+    ]
+  }
+}

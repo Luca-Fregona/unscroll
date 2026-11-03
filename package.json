@@ -1,0 +1,31 @@
+{
+  "name": "unscroll",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Removes endless short-video feeds (Reels, Shorts) and keeps the rest of each app usable.",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Luca-Fregona/unscroll"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "validate": "tsx core/cli/validate-rules.ts rules",
+    "build": "tsx web/build/cli.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "ajv": "^8.20.0",
+    "css-what": "^8.0.0",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.1.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
+  }
+}

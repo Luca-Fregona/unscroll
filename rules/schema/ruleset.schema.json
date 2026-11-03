@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Luca-Fregona/unscroll/blob/main/rules/schema/ruleset.schema.json",
+  "title": "unscroll rule set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "description", "version"],
+  "anyOf": [{ "required": ["web"] }, { "required": ["android"] }],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "id": { "$ref": "#/$defs/id" },
+    "name": { "$ref": "#/$defs/text" },
+    "description": { "$ref": "#/$defs/text" },
+    "version": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+    "web": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["matches", "redirects", "hide"],
+      "properties": {
+        "matches": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^(\\*|https?)://(\\*|(\\*\\.)?[a-z0-9.-]+)/.*$" }
+        },
+        "redirects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description", "from", "to"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "description": { "$ref": "#/$defs/text" },
+              "from": { "$ref": "#/$defs/text" },
+              "to": { "type": "string", "pattern": "^/" }
+            }
+          }
+        },
+        "hide": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description", "selector"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "description": { "$ref": "#/$defs/text" },
+              "selector": { "$ref": "#/$defs/text" }
+            }
+          }
+        }
+      }
+    },
+    "android": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package", "testedVersion", "rules"],
+      "properties": {
+        "package": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9_]*)+$" },
+        "testedVersion": { "type": "string" },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description", "when", "action"],
+            "properties": {
+              "id": { "$ref": "#/$defs/id" },
+              "description": { "$ref": "#/$defs/text" },
+              "when": {
+                "type": "object",
+                "additionalProperties": false,
+                "minProperties": 1,
+                "properties": {
+                  "viewId": { "$ref": "#/$defs/text" },
+                  "contentDescription": { "$ref": "#/$defs/text" }
+                }
+              },
+              "action": { "enum": ["back", "home", "overlay"] }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "text": { "type": "string", "minLength": 1 }
+  }
+}

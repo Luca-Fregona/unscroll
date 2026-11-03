@@ -76,7 +76,7 @@ web/README.md                 install guide (iOS, desktop, Android Firefox)
   ```
 - Produces: `validateRuleSet(data: unknown): ValidationResult` in `core/validate.ts`.
 
-- [ ] **Step 1: Set up the toolchain**
+- [x] **Step 1: Set up the toolchain**
 
 `package.json`: name `unscroll`, version `0.1.0`, `"private": true`, `"type": "module"`, license `GPL-3.0-or-later`, `repository.url` set to `https://github.com/Luca-Fregona/unscroll`, `engines.node` `>=22`. Scripts:
 `"test": "vitest run"`, `"typecheck": "tsc --noEmit"`, `"validate": "tsx core/cli/validate-rules.ts rules"`, `"build": "tsx web/build/cli.ts"`.
@@ -86,7 +86,7 @@ Run: `npm i -D typescript@5 vitest@5 jsdom ajv@8 css-what@8 esbuild tsx @types/n
 `tsconfig.json`: `target ES2022`, `module ESNext`, `moduleResolution Bundler`, `lib ["ES2022","DOM","DOM.Iterable"]`, `strict`, `noEmit`, `resolveJsonModule`, `esModuleInterop`, `skipLibCheck`, `types ["node"]`.
 `vitest.config.ts`: include `**/*.test.ts`, exclude `node_modules/**`, `dist/**`, `android/**`.
 
-- [ ] **Step 2: Create the fixture `core/fixtures/valid-full.json`**
+- [x] **Step 2: Create the fixture `core/fixtures/valid-full.json`**
 
 ```json
 {
@@ -105,7 +105,7 @@ Run: `npm i -D typescript@5 vitest@5 jsdom ajv@8 css-what@8 esbuild tsx @types/n
 }
 ```
 
-- [ ] **Step 3: Write the failing tests**
+- [x] **Step 3: Write the failing tests**
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -136,11 +136,11 @@ describe("validateRuleSet — schema", () => {
 });
 ```
 
-- [ ] **Step 4: Run the tests and confirm they fail**
+- [x] **Step 4: Run the tests and confirm they fail**
 
 Run: `npx vitest run core/validate.test.ts`. Expected: FAIL, because `./validate` cannot be resolved.
 
-- [ ] **Step 5: Write the schema and implement `validateRuleSet`**
+- [x] **Step 5: Write the schema and implement `validateRuleSet`**
 
 The schema uses draft 2020-12 with `additionalProperties: false` on every object. The top level also allows an optional string `$schema`. Values from the spec:
 - `schemaVersion`: `const: 1`
@@ -157,11 +157,11 @@ The schema uses draft 2020-12 with `additionalProperties: false` on every object
 
 `validateRuleSet` compiles the schema once with `new Ajv2020({ allErrors: true })`, imported from `ajv/dist/2020.js`. It maps each Ajv error to `` `${instancePath || "/"} ${message}` ``.
 
-- [ ] **Step 6: Run the tests and typecheck**
+- [x] **Step 6: Run the tests and typecheck**
 
 Run: `npx vitest run core/validate.test.ts && npm run typecheck`. Expected: 6 passed, no type errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add package.json package-lock.json tsconfig.json vitest.config.ts core rules/schema
