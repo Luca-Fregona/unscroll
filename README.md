@@ -28,6 +28,14 @@ The **rules** describe where the short-video feeds live: CSS selectors and URL r
 
 **Why not the iPhone apps themselves?** iOS does not let any app look inside another app. Screen Time can only block a whole app, so every "block Reels on iPhone" product works through the website. unscroll does the same, openly and for free.
 
+## Why it is easy to use
+
+- **No Mac, no Xcode, no developer account.** On iPhone you only need the free *Userscripts* app from the App Store.
+- **No computer needed.** Install and update everything from your phone.
+- **No sideloading and no 7-day expiry.** Nothing is signed with a personal certificate, so nothing stops working after a week.
+- **Updates arrive by themselves.** Your script manager fetches new rules from the release page.
+- **Easy to turn off.** Disable the script and everything is back as before.
+
 ## Install
 
 iPhone, iPad, desktop browsers and Firefox for Android: follow [`web/README.md`](web/README.md). The install links start working with the first release, v0.1.0.
