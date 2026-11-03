@@ -10,11 +10,12 @@ The full rationale lives in [`docs/superpowers/specs/2026-11-03-unscroll-design.
 
 ## Phase 1: Rules and web client → v0.1
 Plan: [`2026-11-03-phase-1-rules-and-userscripts.md`](docs/superpowers/plans/2026-11-03-phase-1-rules-and-userscripts.md)
-- [ ] Rules schema and validator (`npm run validate`)
-- [ ] Web engine: redirects, hide-CSS, SPA navigation
-- [ ] YouTube and Instagram rule sets
-- [ ] Userscript build, checked on iPhone Safari and desktop
-- [ ] CI and tagged GitHub Releases
+- [x] Rules schema and validator (`npm run validate`)
+- [x] Web engine: redirects, hide-CSS, SPA navigation
+- [x] YouTube and Instagram rule sets
+- [x] Userscript build
+- [ ] Check the rules on iPhone Safari and desktop
+- [x] CI and tagged GitHub Releases
 - [ ] Tag `v0.1.0`
 
 ## Phase 2: Android client → v0.2

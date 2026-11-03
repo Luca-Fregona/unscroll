@@ -1,9 +1,40 @@
 # Web client (userscripts)
 
-The engine and build pipeline that turn each `rules/<id>.json` into `dist/unscroll-<id>.user.js`. The result runs in:
+Each `rules/<id>.json` becomes a userscript, `unscroll-<id>.user.js`. Install only the services you want to clean up.
 
-- **iPhone / iPad:** Safari with the free *Userscripts* extension
-- **Desktop:** Violentmonkey or Tampermonkey
-- **Android:** Firefox with Violentmonkey (websites only)
+| Service | Install link |
+|---|---|
+| YouTube | https://github.com/Luca-Fregona/unscroll/releases/latest/download/unscroll-youtube.user.js |
+| Instagram | https://github.com/Luca-Fregona/unscroll/releases/latest/download/unscroll-instagram.user.js |
 
-Status: being built in Phase 1. See the [plan](../docs/superpowers/plans/2026-11-03-phase-1-rules-and-userscripts.md). The install guide is written in Task 10.
+Your script manager updates installed scripts automatically from the same links.
+
+## iPhone and iPad
+
+1. Install **Userscripts** from the App Store. It is free and open source.
+2. Go to Settings → Apps → Safari → Extensions → Userscripts, turn it on, and allow it on `youtube.com` and `instagram.com`.
+3. Open an install link above in Safari, tap the Userscripts button in the address bar, and confirm the install.
+4. Use YouTube and Instagram in Safari, at `m.youtube.com` and `instagram.com`. Optionally, remove the apps or put them behind a Screen Time limit, so you don't open them out of habit.
+
+## Desktop
+
+Install **Violentmonkey** or **Tampermonkey** in your browser, then open an install link above and confirm.
+
+## Android
+
+**Firefox** with the **Violentmonkey** add-on works for the websites. The official apps are covered by the Android client in Phase 2.
+
+## Turning it off
+
+Disable or remove the script in your script manager. Nothing else is installed or stored.
+
+## Development
+
+```bash
+npm ci
+npm test          # Vitest
+npm run validate  # check rules/*.json
+npm run build     # write dist/unscroll-<id>.user.js
+```
+
+To try a local build, install the file from `dist/` in your script manager.

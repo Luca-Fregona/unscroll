@@ -7,7 +7,7 @@
 - **Community rules.** When an app changes its layout, one small rule fix updates every client.
 - **You stay in control.** Turning unscroll off is always one tap away.
 
-> **Status:** pre-alpha. The design and the first implementation plan are done, and the code is being built. See the [roadmap](ROADMAP.md).
+> **Status:** pre-alpha. The web client (Phase 1) is built and waiting for its first release. See the [roadmap](ROADMAP.md).
 
 ## How it works
 
@@ -30,7 +30,7 @@ The **rules** describe where the short-video feeds live: CSS selectors and URL r
 
 ## Install
 
-Coming with v0.1. The guide will live in [`web/README.md`](web/README.md).
+iPhone, iPad, desktop browsers and Firefox for Android: follow [`web/README.md`](web/README.md). The install links start working with the first release, v0.1.0.
 
 ## Contributing
 

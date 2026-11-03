@@ -21,4 +21,4 @@ unscroll removes short-video feeds (Reels, Shorts) and keeps the rest of each ap
 ## Hard constraints
 - No network requests, storage or analytics in client code.
 - Rule data lives only in `rules/` (CC0-1.0). Code is GPL-3.0-or-later.
-- The repo URL appears only in `package.json` → `repository.url`.
+- In code, the repo URL comes only from `package.json` → `repository.url`.

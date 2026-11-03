@@ -614,17 +614,17 @@ Run: `npx vitest run web/build && npm run build`. Expected: 2 passed, then `buil
 - Create: `.github/workflows/ci.yml`, `.github/workflows/release.yml`
 - Modify: `web/README.md`, `README.md` (Install section)
 
-- [ ] **Step 1: Write `ci.yml`**
+- [x] **Step 1: Write `ci.yml`**
 
-It runs on push to `main` and on pull requests, using `ubuntu-latest`, `actions/checkout@v5`, and `actions/setup-node@v5` with `node-version: 22` and `cache: npm`. Bump these if newer majors exist. Steps: `npm ci`, `npm run typecheck`, `npm run validate`, `npm test`, `npm run build`.
+It runs on push to `main` and on pull requests, using `ubuntu-latest`, `actions/checkout@v7`, and `actions/setup-node@v7` with `node-version: 22` and `cache: npm`. Bump these if newer majors exist. Steps: `npm ci`, `npm run typecheck`, `npm run validate`, `npm test`, `npm run build`.
 
-- [ ] **Step 2: Write `release.yml`**
+- [x] **Step 2: Write `release.yml`**
 
 It runs on tags `v*` with `permissions: contents: write`. Its steps are the same as CI, plus:
 - a version guard: `test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"`
 - `gh release create "$GITHUB_REF_NAME" dist/*.user.js --generate-notes`, with `GH_TOKEN: ${{ github.token }}`
 
-- [ ] **Step 3: Write the install guide in `web/README.md`**
+- [x] **Step 3: Write the install guide in `web/README.md`**
 
 - **iPhone/iPad:** install Userscripts from the App Store, enable it in Settings → Apps → Safari → Extensions, and allow it on youtube.com and instagram.com. Open the `releases/latest/download/unscroll-<id>.user.js` link in Safari and confirm the install. Optional tip: remove the Instagram app or put it behind a Screen Time limit, and use instagram.com instead.
 - **Desktop:** Violentmonkey or Tampermonkey, then open the same links.
@@ -633,9 +633,9 @@ It runs on tags `v*` with `permissions: contents: write`. Its steps are the same
 
 Link the guide from the README Install section.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
-Run: `npx --yes @action-validator/cli .github/workflows/ci.yml .github/workflows/release.yml` (or push to a branch and watch Actions). Then run `npm run typecheck && npm run validate && npm test && npm run build`. Expected: all green.
+Run: `npx --yes @action-validator/cli <file>` once per workflow file (or push to a branch and watch Actions). Then run `npm run typecheck && npm run validate && npm test && npm run build`. Expected: all green.
 
 - [ ] **Step 5: Commit, then release (maintainer)**
 
