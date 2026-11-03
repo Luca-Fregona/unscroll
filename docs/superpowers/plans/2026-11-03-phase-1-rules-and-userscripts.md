@@ -339,7 +339,7 @@ Expected: 5 passed.
 **Interfaces:**
 - Produces: `buildHideCss(rules: HideRule[]): string`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```ts
 it("returns an empty string for no rules", () => expect(buildHideCss([])).toBe(""));
@@ -350,7 +350,7 @@ it("emits one block per rule so a bad selector only drops itself", () =>
   ])).toBe('ytd-reel-shelf-renderer { display: none !important; }\na[href="/reels/"] { display: none !important; }'));
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 2 passed. Then **Step 5:** commit with `feat: hide-css builder`.
+- [x] **Step 2: Run the tests and confirm they fail.** Then **Step 3:** implement it. Then **Step 4:** run them and expect 2 passed. Then **Step 5:** commit with `feat: hide-css builder`.
 
 ---
 
