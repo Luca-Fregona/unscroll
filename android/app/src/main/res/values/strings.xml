@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">unscroll</string>
+    <string name="service_description">Closes the Reels and Shorts screens of Instagram and YouTube by pressing Back. It only receives events from those two apps, reads element ids and labels to recognize those screens, and never stores or sends anything. Turn it off here at any time.</string>
 </resources>
