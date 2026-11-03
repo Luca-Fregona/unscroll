@@ -1,0 +1,19 @@
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+
+# Android (Phase 2)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+*.keystore
+*.jks
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/

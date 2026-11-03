@@ -1,0 +1,43 @@
+name: Broken rule
+description: A Reels/Shorts feed is showing again, or something that should work is hidden.
+title: "[broken rule] <service>: <what you see>"
+labels: ["broken-rule"]
+body:
+  - type: dropdown
+    id: service
+    attributes:
+      label: Service
+      options: [YouTube, Instagram, Other]
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - iPhone/iPad Safari (Userscripts)
+        - Desktop browser (Violentmonkey/Tampermonkey)
+        - Android Firefox (Violentmonkey)
+        - Android app (unscroll)
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: OS, browser or app version, and the unscroll version shown in your script manager.
+      placeholder: "iOS 26.1, Safari, unscroll 0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page URL or app screen
+      placeholder: "https://m.youtube.com/ or Instagram > Reels tab"
+  - type: textarea
+    id: what
+    attributes:
+      label: What do you see?
+      description: What came back, or what got hidden by mistake. Screenshots welcome.
+    validations:
+      required: true
