@@ -100,7 +100,7 @@ Field rules:
 
 **What gets blocked in v0.1**
 - YouTube: Shorts links redirect to the normal player, and Shorts shelves, cards and navigation entries are hidden on both desktop (`www`) and mobile (`m.`) layouts.
-- Instagram: the Reels tab feed (`/reels`, `/reels/<code>/`) and the Explore grid (exactly `/explore/`) redirect to `/`, and their navigation links are hidden. A single reel a friend sends (`/reel/<code>/`) and Explore search (`/explore/search/`) stay reachable.
+- Instagram: the Reels tab feed (`/reels`, `/reels/<code>/`) redirects to `/`, and its navigation link is hidden. The Explore grid (exactly `/explore/`) redirects to the search page `/explore/search/`, and its link stays visible because on mobile it is the search entry. A single reel a friend sends (`/reel/<code>/`) stays reachable.
 
 ### 5.2 Web client (Phase 1)
 

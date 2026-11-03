@@ -25,7 +25,7 @@
 
 1. **iPhone Safari loads `m.youtube.com`, not `www`.** YouTube rules must match both hosts and include the mobile `ytm-*` selectors. Pinned in Task 8.
 2. **Shorts links from share sheets carry query strings** (`?feature=share`, `&t=10`). The redirect must still keep the right 11-character video ID. Pinned in Tasks 4 and 8.
-3. **A reel a friend sends in DMs (`/reel/<code>/`) must still open.** Only the Reels tab feed (`/reels…`) and the bare Explore grid redirect, and `/explore/search/` and `/direct/` stay reachable. Pinned in Task 8.
+3. **A reel a friend sends in DMs (`/reel/<code>/`) must still open, and so must search.** Only the Reels tab feed (`/reels…`) and the bare Explore grid redirect. The grid goes to `/explore/search/`, and `/direct/` stays reachable. Pinned in Task 8.
 4. **Tapping a Short inside the SPA changes the URL without a page load.** It must still redirect. Pinned in Task 7.
 5. **One stale or invalid selector must not disable the other hide rules.** Each rule is its own CSS block, and comma lists are rejected. Pinned in Tasks 2 and 5.
 
@@ -458,7 +458,7 @@ it("falls back to <html> when <head> does not exist yet", () => {
 **Interfaces:**
 - Consumes: `loadRuleSets` (Task 3), `resolveRedirect` (Task 4)
 
-- [ ] **Step 1: Write the failing regression tests**
+- [x] **Step 1: Write the failing regression tests**
 
 ```ts
 const sets = await loadRuleSets(fileURLToPath(new URL(".", import.meta.url)));
@@ -470,21 +470,23 @@ it("YouTube Shorts open in the player with the right id", () =>
   expect(go("youtube", "https://m.youtube.com/shorts/dQw4w9WgXcQ?feature=share")).toBe("https://m.youtube.com/watch?v=dQw4w9WgXcQ"));
 it("YouTube hides mobile Shorts surfaces", () =>
   expect(byId.youtube.web!.hide.some((r) => r.selector.startsWith("ytm-"))).toBe(true));
-it("Instagram Reels feed and Explore grid go home", () => {
+it("Instagram Reels feed goes home and the Explore grid goes to search", () => {
   expect(go("instagram", "https://www.instagram.com/reels/C1a2B3c4D5e/")).toBe("https://www.instagram.com/");
-  expect(go("instagram", "https://www.instagram.com/explore/")).toBe("https://www.instagram.com/");
+  expect(go("instagram", "https://www.instagram.com/explore/")).toBe("https://www.instagram.com/explore/search/");
 });
+it("Instagram keeps the Explore link, which is the search entry on mobile", () =>
+  expect(byId.instagram.web!.hide.map((r) => r.selector)).not.toContain('a[href="/explore/"]'));
 it("Instagram keeps single reels, Explore search and DMs reachable", () => {
   for (const p of ["/reel/C1a2B3c4D5e/", "/explore/search/", "/direct/inbox/"])
     expect(go("instagram", `https://www.instagram.com${p}`)).toBeNull();
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run rules/rules.test.ts`. Expected: FAIL, because `byId.youtube` is undefined.
 
-- [ ] **Step 3: Write the two rule sets**
+- [x] **Step 3: Write the two rule sets**
 
 Both have `"$schema": "./schema/ruleset.schema.json"`, `schemaVersion: 1` and `version: "2026.11.03"`. They have **no `android` block yet**, because Phase 2 adds it. Copy the descriptions from spec §5.1.
 
@@ -512,15 +514,14 @@ Both have `"$schema": "./schema/ruleset.schema.json"`, `schemaVersion: 1` and `v
 **instagram.json**
 - `matches`: `*://www.instagram.com/*`
 - Redirect `reels-feed`: `^/reels(/|$)` → `/`
-- Redirect `explore-grid`: `^/explore/?$` → `/`
-- Hide `reels-nav-link`: `a[href="/reels/"]`
-- Hide `explore-nav-link`: `a[href="/explore/"]`
+- Redirect `explore-grid`: `^/explore/?$` → `/explore/search/`
+- Hide `reels-nav-link`: `a[href="/reels/"]`. The Explore link stays visible, because on mobile it is the search entry.
 
-- [ ] **Step 4: Run the tests and the validator**
+- [x] **Step 4: Run the tests and the validator**
 
-Run: `npx vitest run rules/rules.test.ts && npm run validate`. Expected: 5 passed, then `✓ 2 rule sets valid`.
+Run: `npx vitest run rules/rules.test.ts && npm run validate`. Expected: 6 passed, then `✓ 2 rule sets valid`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add rules && git commit -m "feat: YouTube and Instagram rule sets"`
 

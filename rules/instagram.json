@@ -1,0 +1,34 @@
+{
+  "$schema": "./schema/ruleset.schema.json",
+  "schemaVersion": 1,
+  "id": "instagram",
+  "name": "Instagram",
+  "description": "Removes the Reels feed and the Explore grid. DMs, search and reels shared with you keep working.",
+  "version": "2026.11.03",
+  "web": {
+    "matches": [
+      "*://www.instagram.com/*"
+    ],
+    "redirects": [
+      {
+        "id": "reels-feed",
+        "description": "The Reels tab feed goes to the home feed",
+        "from": "^/reels(/|$)",
+        "to": "/"
+      },
+      {
+        "id": "explore-grid",
+        "description": "The Explore grid goes to the search page",
+        "from": "^/explore/?$",
+        "to": "/explore/search/"
+      }
+    ],
+    "hide": [
+      {
+        "id": "reels-nav-link",
+        "description": "Reels link in the navigation",
+        "selector": "a[href=\"/reels/\"]"
+      }
+    ]
+  }
+}

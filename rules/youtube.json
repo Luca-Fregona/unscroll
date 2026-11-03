@@ -1,0 +1,86 @@
+{
+  "$schema": "./schema/ruleset.schema.json",
+  "schemaVersion": 1,
+  "id": "youtube",
+  "name": "YouTube",
+  "description": "Hides YouTube Shorts and opens Shorts links in the normal player.",
+  "version": "2026.11.03",
+  "web": {
+    "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"],
+    "redirects": [
+      {
+        "id": "shorts-to-watch",
+        "description": "Open a Short in the normal player",
+        "from": "^/shorts/([A-Za-z0-9_-]{11})",
+        "to": "/watch?v=$1"
+      }
+    ],
+    "hide": [
+      {
+        "id": "shorts-shelf-home",
+        "description": "Desktop: Shorts shelf on the home page",
+        "selector": "ytd-rich-shelf-renderer[is-shorts]"
+      },
+      {
+        "id": "shorts-shelf",
+        "description": "Desktop: Shorts shelf in search and recommendations",
+        "selector": "ytd-reel-shelf-renderer"
+      },
+      {
+        "id": "shorts-grid-shelf",
+        "description": "Desktop: grid of Shorts in search results",
+        "selector": "grid-shelf-view-model:has(a[href^=\"/shorts/\"])"
+      },
+      {
+        "id": "shorts-item-home",
+        "description": "Desktop: single Short in the home grid",
+        "selector": "ytd-rich-item-renderer:has(a[href^=\"/shorts/\"])"
+      },
+      {
+        "id": "shorts-item-search",
+        "description": "Desktop: single Short in search results",
+        "selector": "ytd-video-renderer:has(a[href^=\"/shorts/\"])"
+      },
+      {
+        "id": "shorts-nav-guide",
+        "description": "Desktop: Shorts entry in the side menu",
+        "selector": "ytd-guide-entry-renderer:has(a[title=\"Shorts\"])"
+      },
+      {
+        "id": "shorts-nav-mini-guide",
+        "description": "Desktop: Shorts entry in the collapsed side menu",
+        "selector": "ytd-mini-guide-entry-renderer[aria-label=\"Shorts\"]"
+      },
+      {
+        "id": "m-shorts-shelf",
+        "description": "Mobile: Shorts shelf",
+        "selector": "ytm-reel-shelf-renderer"
+      },
+      {
+        "id": "m-shorts-lockup",
+        "description": "Mobile: Shorts card",
+        "selector": "ytm-shorts-lockup-view-model"
+      },
+      {
+        "id": "m-shorts-lockup-v2",
+        "description": "Mobile: Shorts card (newer layout)",
+        "selector": "ytm-shorts-lockup-view-model-v2"
+      },
+      {
+        "id": "m-shorts-section",
+        "description": "Mobile: home section made of Shorts",
+        "selector": "ytm-rich-section-renderer:has(a[href^=\"/shorts/\"])"
+      },
+      {
+        "id": "m-shorts-item",
+        "description": "Mobile: single Short in a feed or search",
+        "selector": "ytm-video-with-context-renderer:has(a[href^=\"/shorts/\"])"
+      },
+      {
+        "id": "m-shorts-nav",
+        "description": "Mobile: Shorts tab in the bottom bar",
+        "selector": "ytm-pivot-bar-item-renderer:has(.pivot-shorts)"
+      }
+    ]
+  }
+}
