@@ -36,3 +36,25 @@ it("Instagram keeps single reels, Explore search and DMs reachable", () => {
   for (const p of ["/reel/C1a2B3c4D5e/", "/explore/search/", "/direct/inbox/"])
     expect(go("instagram", `https://www.instagram.com${p}`)).toBeNull();
 });
+
+const android = (id: string) => byId[id].android!;
+const androidApps = ["youtube"];
+
+it("ships Android rules for the official apps", () => {
+  expect(android("youtube").package).toBe("com.google.android.youtube");
+  for (const id of androidApps) {
+    expect(android(id).testedVersion).not.toBe("");
+    expect(android(id).rules.length).toBeGreaterThan(0);
+  }
+});
+
+it("anchors every Android rule on a resource id, which survives a change of phone language", () => {
+  for (const id of androidApps)
+    for (const rule of android(id).rules) expect(rule.when.viewId).toMatch(/^[\w.]+:id\/\w+$/);
+});
+
+it("only references resource ids of its own app", () => {
+  for (const id of androidApps)
+    for (const rule of android(id).rules)
+      expect(rule.when.viewId!.startsWith(`${android(id).package}:id/`)).toBe(true);
+});
