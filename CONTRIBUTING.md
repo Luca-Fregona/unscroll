@@ -12,13 +12,21 @@ Rules are plain JSON in [`rules/`](rules/). See [`rules/README.md`](rules/README
 
 **Websites.** Open the page in a desktop browser's developer tools, or use Safari Web Inspector with an iPhone connected to a Mac. Find the element that wraps the feed and write the most stable selector you can. Prefer attributes like `href^="/shorts/"` over generated class names.
 
-**Android apps (Phase 2).** Open the screen you want to block, then run:
+**Android apps.** Use an emulator or a phone with USB debugging, open the screen you want to block, then run:
 
 ```bash
 adb shell uiautomator dump /sdcard/dump.xml && adb pull /sdcard/dump.xml
 ```
 
-Search the file for `Reels`, `Shorts` and similar, and note the `resource-id` and `content-desc`.
+In Git Bash on Windows, put `MSYS_NO_PATHCONV=1` in front of the command, or Git Bash rewrites `/sdcard/...` into a Windows path.
+
+Do the same for **every screen that must keep working** (home, search, messages, a normal video), then list the `resource-id`s of each dump and keep the ones that appear **only** in the screen you want to block:
+
+```bash
+node -e 'const x=require("fs").readFileSync(process.argv[1],"utf8");console.log([...new Set([...x.matchAll(/resource-id="([^"]+)"/g)].map(m=>m[1]))].sort().join("\n"))' dump.xml
+```
+
+Write the rule against a `viewId` (see [`rules/README.md`](rules/README.md)), and set `testedVersion` to the app's `versionName` (`adb shell dumpsys package <package> | grep versionName`). **Never commit a full dump:** it contains whatever was on the screen, such as names, captions and messages. Put dumps outside the repo.
 
 After editing a rule file, bump its `version` to today's date (`YYYY.MM.DD`) and run:
 
@@ -30,7 +38,7 @@ npm test
 
 ## 3. Work on the code
 
-- Requirements: Node.js 22 or later, and npm. Phase 2 also needs Android Studio.
+- Requirements: Node.js 22 or later, and npm. The Android client also needs JDK 17 or later and the Android SDK (platform 37, build-tools 36); Android Studio is optional. See [`android/README.md`](android/README.md).
 - Larger changes follow the [Superpowers](https://github.com/obra/superpowers) flow:
   1. a design spec in `docs/superpowers/specs/`
   2. a plan in `docs/superpowers/plans/`

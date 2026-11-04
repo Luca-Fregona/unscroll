@@ -74,7 +74,8 @@
                 "minProperties": 1,
                 "properties": {
                   "viewId": { "$ref": "#/$defs/text" },
-                  "contentDescription": { "$ref": "#/$defs/text" }
+                  "contentDescription": { "$ref": "#/$defs/text" },
+                  "selected": { "const": true }
                 }
               },
               "action": { "enum": ["back", "home", "overlay"] }

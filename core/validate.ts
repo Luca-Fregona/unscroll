@@ -11,7 +11,12 @@ export function validateRuleSet(data: unknown): ValidationResult {
     return { ok: false, errors };
   }
   const ruleSet = data as unknown as RuleSet;
-  const errors = [...duplicateIds(ruleSet), ...redirectErrors(ruleSet), ...selectorErrors(ruleSet)];
+  const errors = [
+    ...duplicateIds(ruleSet),
+    ...redirectErrors(ruleSet),
+    ...selectorErrors(ruleSet),
+    ...androidWhenErrors(ruleSet),
+  ];
   return errors.length > 0 ? { ok: false, errors } : { ok: true, ruleSet };
 }
 
@@ -63,4 +68,11 @@ function selectorErrors(ruleSet: RuleSet): string[] {
     if (groups !== 1) errors.push(`hide "${rule.id}": use one selector per rule`);
   }
   return errors;
+}
+
+/** `selected` only narrows a match, so it needs a viewId or a contentDescription to narrow. */
+function androidWhenErrors(ruleSet: RuleSet): string[] {
+  return (ruleSet.android?.rules ?? [])
+    .filter(({ when }) => when.selected && when.viewId === undefined && when.contentDescription === undefined)
+    .map((rule) => `android rule "${rule.id}": selected needs a viewId or contentDescription`);
 }

@@ -20,7 +20,7 @@ export interface WebTarget {
 export interface AndroidRule {
   id: string;
   description: string;
-  when: { viewId?: string; contentDescription?: string };
+  when: { viewId?: string; contentDescription?: string; selected?: true };
   action: "back" | "home" | "overlay";
 }
 

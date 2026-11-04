@@ -89,3 +89,26 @@ describe("validateRuleSet — redirect chains", () => {
     });
   });
 });
+
+describe("validateRuleSet — android selected", () => {
+  it("accepts selected: true next to a viewId", () => {
+    const d = clone();
+    d.android.rules[0].when = { viewId: "com.example.app:id/tab", selected: true };
+    expect(validateRuleSet(d).ok).toBe(true);
+  });
+
+  it("rejects selected: false", () => {
+    const d = clone();
+    d.android.rules[0].when = { viewId: "com.example.app:id/tab", selected: false };
+    expect(validateRuleSet(d).ok).toBe(false);
+  });
+
+  it("rejects selected on its own", () => {
+    const d = clone();
+    d.android.rules[0].when = { selected: true };
+    expect(validateRuleSet(d)).toEqual({
+      ok: false,
+      errors: ['android rule "feed-screen": selected needs a viewId or contentDescription'],
+    });
+  });
+});

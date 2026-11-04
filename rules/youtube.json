@@ -4,7 +4,7 @@
   "id": "youtube",
   "name": "YouTube",
   "description": "Hides YouTube Shorts and opens Shorts links in the normal player.",
-  "version": "2026.11.03",
+  "version": "2026.11.04",
   "web": {
     "matches": ["*://www.youtube.com/*", "*://m.youtube.com/*"],
     "redirects": [
@@ -80,6 +80,30 @@
         "id": "m-shorts-nav",
         "description": "Mobile: Shorts tab in the bottom bar",
         "selector": "ytm-pivot-bar-item-renderer:has(.pivot-shorts)"
+      }
+    ]
+  },
+  "android": {
+    "package": "com.google.android.youtube",
+    "testedVersion": "20.10.41",
+    "rules": [
+      {
+        "id": "android-shorts-pager",
+        "description": "The Shorts player (the pager of full-screen Shorts)",
+        "when": { "viewId": "com.google.android.youtube:id/reel_recycler" },
+        "action": "back"
+      },
+      {
+        "id": "android-shorts-page",
+        "description": "One page of the Shorts player, in case the pager is renamed",
+        "when": { "viewId": "com.google.android.youtube:id/reel_player_page_container" },
+        "action": "back"
+      },
+      {
+        "id": "android-shorts-screen",
+        "description": "The Shorts screen itself, in case the pager and its pages are renamed",
+        "when": { "viewId": "com.google.android.youtube:id/reel_watch_fragment_root" },
+        "action": "back"
       }
     ]
   }

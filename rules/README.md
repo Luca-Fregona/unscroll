@@ -9,7 +9,12 @@ The full format is described in [§5.1 of the design](../docs/superpowers/specs/
 - `web.matches`: the sites the userscript runs on, in `@match` syntax.
 - `web.redirects`: `{ id, description, from, to }`. `from` is a regex tested against the path only. `to` is a same-origin path, and `$1`…`$9` insert capture groups.
 - `web.hide`: `{ id, description, selector }`. Use **one CSS selector per rule** and never a comma list, so one stale selector can't break the others.
-- `android.rules`: `{ id, description, when: { viewId?, contentDescription? }, action }`, where `action` is `back`, `home` or `overlay`. Added in Phase 2.
+- `android.rules`: `{ id, description, when: { viewId?, contentDescription?, selected? }, action }`, where `action` is `back`, `home` or `overlay`.
+  - Every condition in `when` must hold on the **same** node, and a rule matches when any node of the window satisfies it. The first matching rule in list order wins.
+  - Prefer `viewId` (`<package>:id/<name>`). It does not change with the phone's language. `contentDescription` is translated, so a rule that depends on it only works for people who use the language it was written in.
+  - Bottom-bar tab buttons exist on every screen of an app, so to tell which tab is showing use `selected: true` next to the tab's `viewId` or `contentDescription`. `selected` can only be `true` and never stands alone.
+  - A rule for an app that is not in the app's `packageNames` list never fires. At the moment those are Instagram and YouTube.
+  - Android rule ids share one namespace with the web rule ids of the same file. The existing ones start with `android-` to keep them apart.
 
 ## Changing a rule
 

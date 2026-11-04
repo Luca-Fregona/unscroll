@@ -96,7 +96,7 @@ Field rules:
 - `web.matches` follow userscript `@match` syntax: `<scheme>://<host>/<path>`, where the scheme is `*`, `http` or `https`, the host may start with `*.`, and the path may contain `*`.
 - `web.redirects[].from` is a JavaScript regex tested against **`location.pathname` only**. `to` is a same-origin path that must start with `/`. `$1`…`$9` insert capture groups, and the original query string is dropped. A rule whose `to` path matches its own `from` is rejected as a loop.
 - `web.hide[].selector` is a single CSS selector, never a comma-separated list. Each one becomes its own CSS rule, so one broken selector cannot disable the others.
-- `android.rules[]` have the shape `{ id, description, when: { viewId?, contentDescription? }, action: "back" | "home" | "overlay" }`, and `when` needs at least one key. Phase 1 defines the format. Phase 2 adds the real Android data after dumping the apps' UI trees.
+- `android.rules[]` have the shape `{ id, description, when: { viewId?, contentDescription?, selected? }, action: "back" | "home" | "overlay" }`, and `when` needs at least one key. Every key present must hold on the same node, and a rule matches when any node of the window satisfies it. `selected` can only be `true`, and it needs a `viewId` or `contentDescription` next to it. It exists because bottom-bar tab buttons are on every screen of an app, so "this tab is the selected one" is the only language-proof way to tell which tab is showing. Prefer `viewId`, since `contentDescription` is translated. Phase 1 defines the format. Phase 2 adds the real Android data after dumping the apps' UI trees.
 
 **What gets blocked in v0.1**
 - YouTube: Shorts links redirect to the normal player, and Shorts shelves, cards and navigation entries are hidden on both desktop (`www`) and mobile (`m.`) layouts.
@@ -113,7 +113,7 @@ Field rules:
 
 - Kotlin, minSdk 26 (Android 8.0). The `AccessibilityService` is scoped with `packageNames` to the target apps only. It listens for window-state and window-content events and matches `when` conditions against the node tree. It acts with `performGlobalAction(BACK | HOME)` or a full-screen `TYPE_ACCESSIBILITY_OVERLAY`, with a cooldown so it cannot loop.
 - The rules are bundled as assets at build time, copied from `../rules/`.
-- There are two build flavors. `offline` has no INTERNET permission, and users can import a rules file by hand. `online` fetches rules from a base URL the user can change, which defaults to this repo. That makes forks first-class. The Phase 2 plan defines the fetch layout, such as an index file.
+- There are two build flavors. `offline` has no INTERNET permission, and users can import a rules file by hand. `online` fetches rules from a base URL the user can change, which defaults to this repo. That makes forks first-class. The fetch layout is `<base>/<id>.json` for every rule set that is bundled, with no index file: a new service also needs a new `packageNames` entry and so a new release anyway. Only HTTPS is accepted (plain HTTP to the emulator's host in debug builds only), a file is at most 256 KiB, it must describe the id it was asked for and be for one of the target packages, and the newest `version` wins, with a fetched or imported copy winning a tie. Rules refresh at most every 24 hours, checked when the app opens and when the service connects, plus a manual button. The app stores only the disclosure flag, the rules address, the last refresh time and the rule files, and backups are off.
 - An in-app disclosure explains exactly what the accessibility service reads and does, before the user enables it.
 - Distribution: signed APKs on GitHub Releases, installed through Obtainium, with an F-Droid submission later. The maintainer registers for Android developer verification before the 2027 global rollout.
 
@@ -133,6 +133,11 @@ Field rules:
 4. **Single reels stay viewable.** `/reel/<code>/` links from DMs are not blocked. Only the endless feeds are.
 5. **Stack:** Node 22 and TypeScript, with Vitest, Ajv, css-what and esbuild for Phase 1, and Kotlin for Phase 2.
 6. **Repo URL:** `https://github.com/Luca-Fregona/unscroll`. It lives in one place, `package.json` → `repository.url`.
+7. **Android application id:** `io.github.lucafregona.unscroll`. It is permanent once an APK is published.
+8. **Android UI and libraries:** Jetpack Compose Material 3. Beyond AndroidX and Compose the app uses `kotlinx-serialization-json` and `kotlinx-coroutines-android` only. Release builds are minified with R8.
+9. **Android rule condition `selected`** (§5.1): added in Phase 2 because tab buttons exist on every screen and the selected state is the only language-proof way to tell which tab is showing.
+10. **Android and the "no network, storage or analytics" rule:** `CLAUDE.md` states it for the web client. On Android, §5.3 explicitly allows fetching rule files and importing them, so the app keeps those and its own few settings, and nothing else.
+11. **Android reels from messages:** on the web a single reel from a DM stays viewable (call 4). In the Android app a reel opened in the same full-screen player as the feed cannot be told apart by a single-node rule, so it may be closed too. Whether Instagram offers a signal that separates them is open until its UI is dumped.
 
 ## 8. Left to the builder
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="disclosure_network">This version downloads rule files from the web address shown in the app, and nothing else. You can change that address.</string>
+    <string name="rules_address_label">Rules address</string>
+    <string name="rules_address_error">This has to be an https:// address</string>
+    <string name="rules_address_help">unscroll downloads one file per app from this address, for example youtube.json.</string>
+    <string name="rules_update_now">Update now</string>
+    <string name="rules_reset_default">Reset to default</string>
+    <string name="refresh_updated">%1$s: updated to %2$s</string>
+    <string name="refresh_up_to_date">%1$s: up to date</string>
+    <string name="refresh_failed">%1$s: %2$s</string>
+    <string name="rules_reset_done">Back to the default address and the rules that came with the app</string>
+</resources>
