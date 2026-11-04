@@ -33,6 +33,7 @@ class UnscrollService : AccessibilityService() {
         val app = application as UnscrollApp
         engine = Engine({ app.rules.current() }, RuleMatcher(), CooldownGate(clock = SystemClock::elapsedRealtime))
         instance = this
+        app.refreshRulesInBackground()
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
