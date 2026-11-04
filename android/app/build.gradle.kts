@@ -76,12 +76,38 @@ android {
         }
     }
 
+    // A release is signed only when all four variables are set (CI does, a plain checkout does not).
+    val signingVariables = listOf("UNSCROLL_KEYSTORE_FILE", "UNSCROLL_KEYSTORE_PASSWORD", "UNSCROLL_KEY_ALIAS", "UNSCROLL_KEY_PASSWORD")
+    val canSignRelease = signingVariables.all { !System.getenv(it).isNullOrEmpty() }
+
+    signingConfigs {
+        if (canSignRelease) {
+            create("release") {
+                storeFile = file(System.getenv("UNSCROLL_KEYSTORE_FILE"))
+                storePassword = System.getenv("UNSCROLL_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("UNSCROLL_KEY_ALIAS")
+                keyPassword = System.getenv("UNSCROLL_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (canSignRelease) signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
 
     lint {
         abortOnError = true
+        // The KTX shortcuts are not worth a dependency: this app only uses plain framework calls.
+        disable += "UseKtx"
     }
 }
 

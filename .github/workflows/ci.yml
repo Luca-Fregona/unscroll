@@ -19,3 +19,16 @@ jobs:
       - run: npm run validate
       - run: npm test
       - run: npm run build
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      # Unit tests, lint and the "offline has no INTERNET" check, for every variant. No emulator needed.
+      - run: ./gradlew check assembleDebug
+        working-directory: android

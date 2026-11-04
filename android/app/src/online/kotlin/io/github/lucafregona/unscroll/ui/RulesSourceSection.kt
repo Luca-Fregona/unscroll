@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.lucafregona.unscroll.BuildConfig
@@ -30,7 +30,7 @@ import kotlinx.coroutines.withContext
 /** The online flavor reads rules from a web address the user can change. The default is this project's own. */
 @Composable
 fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     var address by remember { mutableStateOf(app.settings.rulesBaseUrl ?: BuildConfig.DEFAULT_RULES_BASE_URL) }
     var status by remember { mutableStateOf(emptyList<String>()) }
@@ -38,9 +38,9 @@ fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
     val addressOk = BaseUrl.parse(address, allowLocalCleartext = BuildConfig.DEBUG) != null
 
     fun describe(result: RefreshResult): String = when (result) {
-        is RefreshResult.Updated -> context.getString(R.string.refresh_updated, result.id, result.version)
-        is RefreshResult.UpToDate -> context.getString(R.string.refresh_up_to_date, result.id)
-        is RefreshResult.Failed -> context.getString(R.string.refresh_failed, result.id, result.reason)
+        is RefreshResult.Updated -> resources.getString(R.string.refresh_updated, result.id, result.version)
+        is RefreshResult.UpToDate -> resources.getString(R.string.refresh_up_to_date, result.id)
+        is RefreshResult.Failed -> resources.getString(R.string.refresh_failed, result.id, result.reason)
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -74,7 +74,7 @@ fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
                 app.settings.rulesBaseUrl = null
                 app.rules.resetStored()
                 address = BuildConfig.DEFAULT_RULES_BASE_URL
-                status = listOf(context.getString(R.string.rules_reset_done))
+                status = listOf(resources.getString(R.string.rules_reset_done))
                 onRulesChanged()
             },
         ) { Text(stringResource(R.string.rules_reset_default)) }

@@ -16,6 +16,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.github.lucafregona.unscroll.R
@@ -30,6 +31,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     var message by remember { mutableStateOf<String?>(null) }
     val resetDone = stringResource(R.string.rules_reset_done)
@@ -41,9 +43,9 @@ fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
                 context.contentResolver.openInputStream(uri)?.let { app.rules.importStream(it) }
             }
             message = when (result) {
-                is ImportResult.Stored -> context.getString(R.string.import_stored, result.id, result.version)
-                is ImportResult.Rejected -> context.getString(R.string.import_rejected, result.reason)
-                null -> context.getString(R.string.import_unreadable)
+                is ImportResult.Stored -> resources.getString(R.string.import_stored, result.id, result.version)
+                is ImportResult.Rejected -> resources.getString(R.string.import_rejected, result.reason)
+                null -> resources.getString(R.string.import_unreadable)
             }
             onRulesChanged()
         }
