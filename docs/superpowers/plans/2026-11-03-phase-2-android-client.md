@@ -92,18 +92,18 @@ android/README.md, rules/README.md, CONTRIBUTING.md, README.md, CLAUDE.md, ROADM
 **Interfaces:**
 - Produces: `applicationId` / `namespace` `io.github.lucafregona.unscroll`; flavor dimension `distribution` with `offline` and `online`; `BuildConfig.ONLINE: Boolean`; `BuildConfig.DEFAULT_RULES_BASE_URL: String` (`""` for offline); Gradle task `verifyOfflineManifest` wired into `check`; assets directory `rules/` containing every `rules/*.json` of the repo root (not `schema/`).
 
-- [ ] **Step 1: Prepare the emulator** (not part of the repo)
+- [x] **Step 1: Prepare the emulator** (not part of the repo)
 
 PowerShell: set `$env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"` and add `platform-tools`, `emulator` and `cmdline-tools\latest\bin` to `PATH`. Create the AVD:
 `avdmanager create avd -n unscroll_api36 -k "system-images;android-36.1;google_apis_playstore;x86_64" -d pixel_8`.
 Start it in the background with `emulator -avd unscroll_api36 -no-snapshot-save`, then `adb wait-for-device` and poll `adb shell getprop sys.boot_completed` until it prints `1`.
 Check `adb shell pm list packages` for `com.android.vending` (Play Store) and write down whether `com.google.android.youtube` is present. If the Play Store is missing, edit the AVD's `config.ini` so `PlayStore.enabled=yes`, or recreate the AVD with a Play Store device definition.
 
-- [ ] **Step 2: Bootstrap Gradle and a buildable empty app**
+- [x] **Step 2: Bootstrap Gradle and a buildable empty app**
 
 Download the Gradle binary distribution that the chosen AGP requires into a new empty scratch directory (never into the repo). From a different directory run `gradle wrapper --gradle-version <v> --gradle-distribution-sha256-sum <sha256 from services.gradle.org>` inside `android/`. Commit `gradlew`, `gradlew.bat` and `gradle/wrapper/*`. Create `settings.gradle.kts` (`rootProject.name = "unscroll"`, `include(":app")`, google() and mavenCentral()), the version catalog, `local.properties` (already ignored) with `sdk.dir`, and an `:app` module with `minSdk 26`, `compileSdk 36`, `targetSdk 36`, `android:allowBackup="false"` and a `MainActivity` that only sets an empty content view. Run `./gradlew assembleDebug` from `android/` and expect success.
 
-- [ ] **Step 3: Write the failing tests**
+- [x] **Step 3: Write the failing tests**
 
 ```kotlin
 // VersionTest.kt (src/test)
@@ -121,11 +121,11 @@ Download the Gradle binary distribution that the chosen AGP requires into a new 
 @Test fun offlineHasNoUrl() { assertFalse(BuildConfig.ONLINE); assertEquals("", BuildConfig.DEFAULT_RULES_BASE_URL) }
 ```
 
-- [ ] **Step 4: Run them and confirm they fail**
+- [x] **Step 4: Run them and confirm they fail**
 
 Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest`. Expected: compile errors, because `ONLINE` and `DEFAULT_RULES_BASE_URL` do not exist.
 
-- [ ] **Step 5: Implement the build configuration in `android/app/build.gradle.kts`**
+- [x] **Step 5: Implement the build configuration in `android/app/build.gradle.kts`**
 
 - Read `../../package.json` with `groovy.json.JsonSlurper`. Set `versionName` and `versionCode` as in Global Constraints.
 - Derive the default URL from `repository.url` (`https://github.com/<owner>/<repo>`, with an optional `.git` suffix or trailing slash) to `https://raw.githubusercontent.com/<owner>/<repo>/main/rules`. Declare `buildConfigField` for `ONLINE` and `DEFAULT_RULES_BASE_URL` in both flavors.
@@ -134,16 +134,16 @@ Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest`. Expected: com
 - Register `verifyOfflineManifest` per `offline` variant with `androidComponents.onVariants` and `SingleArtifact.MERGED_MANIFEST`. It fails if the merged manifest contains `android.permission.INTERNET`. Hook it into `check`.
 - Enable `buildConfig = true` and lint `abortOnError = true`.
 
-- [ ] **Step 6: Run the tests, then prove the manifest check can fail**
+- [x] **Step 6: Run the tests, then prove the manifest check can fail**
 
 Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest`. Expected: 3 passed.
 Temporarily add the INTERNET permission to the main manifest, run `./gradlew verifyOfflineDebugManifest` and confirm it fails. Remove the line and confirm it passes.
 
-- [ ] **Step 7: Install on the emulator**
+- [x] **Step 7: Install on the emulator**
 
 Run `./gradlew installOfflineDebug`, then `adb shell dumpsys package io.github.lucafregona.unscroll | findstr INTERNET` (expect no output). Run `./gradlew installOnlineDebug` and expect INTERNET listed. Check that the assets exist: `unzip -l android/app/build/outputs/apk/offline/debug/*.apk | grep assets/rules/` lists `instagram.json` and `youtube.json`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 `git add android .gitignore && git commit -m "feat(android): project skeleton with offline and online flavors"`
 
@@ -158,7 +158,7 @@ Run `./gradlew installOfflineDebug`, then `adb shell dumpsys package io.github.l
 **Interfaces:**
 - Produces: `AndroidRule.when` becomes `{ viewId?: string; contentDescription?: string; selected?: true }` in `core/types.ts`. Kotlin (Task 4) reads the same field.
 
-- [ ] **Step 1: Write the failing tests** (append to `core/validate.test.ts`)
+- [x] **Step 1: Write the failing tests** (append to `core/validate.test.ts`)
 
 ```ts
 describe("validateRuleSet — android selected", () => {
@@ -178,25 +178,27 @@ describe("validateRuleSet — android selected", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and confirm they fail**
+- [x] **Step 2: Run the tests and confirm they fail**
 
 Run: `npx vitest run core/validate.test.ts`. Expected: the first test fails (`selected` is an unknown property), the third returns a schema error instead of the semantic message.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Schema: add `"selected": { "const": true }` to `when.properties`. Types: add `selected?: true`. Validator: add a semantic check after the schema passes, producing the exact message above. Fixture: add a second Android rule `{ id: "feed-tab", description: "Feed tab is selected", when: { viewId: "com.example.app:id/feed_tab", selected: true }, action: "back" }`. Spec §5.1: extend the `android.rules[]` shape line with `selected?: true`, one sentence saying why (tab buttons exist on every screen), and that `when` conditions must all hold on one node.
 
-- [ ] **Step 4: Run everything**
+- [x] **Step 4: Run everything**
 
 Run: `npm test && npm run typecheck && npm run validate`. Expected: all green.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add core rules docs && git commit -m "feat: android when.selected condition"`
 
 ---
 
 ### Task 3: UI trees of the official apps become `android` rules
+
+> **Status:** half done. YouTube is finished (commit `c45de2d`: the dumps, the three rules and the tests). Instagram is waiting for a signed-in Instagram on the emulator, so the boxes below stay open until its dump is taken. See *Deviations from this plan* at the end.
 
 **Files:**
 - Modify: `rules/youtube.json`, `rules/instagram.json` (add `android` blocks, bump `version` to the execution date)
@@ -293,7 +295,7 @@ Run: `npm run validate && npm test && npm run typecheck`. Expected: all green, 3
   object TargetPackages { val ALL: Set<String> }   // com.instagram.android, com.google.android.youtube
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Parse with `Json.parseToJsonElement` and read fields by hand. Do not use `ignoreUnknownKeys` shortcuts for the `android` block. The `web` block is ignored entirely. Tests:
 - `parsesTheSharedFixture`: `../../core/fixtures/valid-full.json` gives `Ok` with package `com.example.app`, two rules, and the second rule has `selected == true`.
@@ -301,19 +303,19 @@ Parse with `Json.parseToJsonElement` and read fields by hand. Do not use `ignore
 - `noAndroidBlock`: a valid rule set with only `web` returns `NoAndroidBlock`.
 - `invalid` cases, each asserting `is ParseResult.Invalid`: malformed JSON, `schemaVersion` 2, `id` `"../x"`, `version` `"3 Nov 2026"`, package `"nodots"`, action `"swipe"`, `when` `{}`, `selected: false`, `selected` alone, duplicate rule ids, a rule missing `description`.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOfflineDebugUnitTest --tests "*RuleSetParserTest"`. Expected: compile error, `RuleSetParser` does not exist.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Mirror the checks of `rules/schema/ruleset.schema.json` for every field the Android client consumes: `schemaVersion == 1`, `id` `^[a-z0-9-]+$`, `version` `^\d{4}\.\d{2}\.\d{2}$`, package pattern, rule `id` unique within `android.rules`, `when` has at least one key and `selected` only as `true` next to `viewId` or `contentDescription`. `Invalid.reason` is a short English sentence naming the field.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOfflineDebugUnitTest testOnlineDebugUnitTest`. Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add android && git commit -m "feat(android): parse android rule sets"`
 
@@ -341,7 +343,7 @@ Run: `./gradlew testOfflineDebugUnitTest testOnlineDebugUnitTest`. Expected: all
       private val gate: CooldownGate) { fun evaluate(packageName: String, root: UiNode): Decision }
   ```
 
-- [ ] **Step 1: Write the failing tests** (a `FakeNode` test double counts every `children` access)
+- [x] **Step 1: Write the failing tests** (a `FakeNode` test double counts every `children` access)
 
 `RuleMatcherTest`:
 - `matchesAViewIdAnywhereInTheTree`
@@ -363,19 +365,19 @@ Run: `./gradlew testOfflineDebugUnitTest testOnlineDebugUnitTest`. Expected: all
 - `overlayIgnoresTheGate`: an overlay match is always `allowed = true` and does not use up the gate
 - `ruleSetsAreReadOnEveryCall`: replacing the lambda's result changes the next decision
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOfflineDebugUnitTest --tests "*engine*"`. Expected: compile error.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `RuleMatcher`: iterative depth-first traversal (no recursion) that stops after `maxNodes` visited nodes, evaluates every rule against each node, and returns the matching rule that comes first in list order. `viewId` and `contentDescription` use exact string equality. `CooldownGate`: a sliding window of action timestamps. `Engine`: looks up the rule set whose `packageName` equals the argument, then delegates. `allowed` is `true` for `OVERLAY` without touching the gate, otherwise `gate.tryAcquire()`.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOfflineDebugUnitTest`. Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add android && git commit -m "feat(android): rule matcher, cooldown gate and engine"`
 
@@ -413,7 +415,7 @@ Run: `./gradlew testOfflineDebugUnitTest`. Expected: all pass.
   ```
   `UnscrollApp` exposes `val rules: RulesRepository` (bundled JSON read from the `rules/` assets, stored files in `filesDir/rules`).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `RulesRepositoryTest` (JUnit `TemporaryFolder`):
 - bundled rule sets are returned for both apps
@@ -433,21 +435,21 @@ Run: `./gradlew testOfflineDebugUnitTest`. Expected: all pass.
 
 `BundledRulesTest` (instrumented): `UnscrollApp.rules.current()` contains ids `instagram` and `youtube`.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOnlineDebugUnitTest`. Expected: compile errors.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 - `RulesRepository`: parse bundled JSON and throw if any is `Invalid` (that is a build bug); stored files are `storeDir/<id>.json`. Per id the highest `version` wins and a tie goes to the stored file. Drop rule sets whose package is not in `TargetPackages.ALL`. Write imports to a temp file and rename.
 - `HttpRulesFetcher`: `HttpURLConnection`, GET, 10 s connect and read timeouts, `instanceFollowRedirects = false`, any status other than 200 throws, read at most `MAX_RULES_BYTES + 1` bytes and throw above the limit.
 - `RulesUpdater.refresh` requests `base.fileUrl(id)` for every id in `repo.bundledIds()` and goes through `repo.import`, so the same validation guards both paths. Compare the fetched `version` against `repo.current()` to tell `Updated` from `UpToDate`.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest` and, with the emulator running, `./gradlew connectedOfflineDebugAndroidTest`. Expected: all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add android && git commit -m "feat(android): rules repository, import and online refresh"`
 
@@ -471,7 +473,7 @@ Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest` and, with the 
   ```
   Component name: `io.github.lucafregona.unscroll/.service.UnscrollService`. `ServiceHarness` (androidTest) offers `enable()`, `disable()`, `open(url: String)`, `waitUntil(timeoutMs: Long, check: () -> Boolean): Boolean`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `ServiceConfigTest` (JVM): parse `src/main/res/xml/accessibility_service_config.xml` and assert `packageNames` equals `TargetPackages.ALL` and equals the set of `android.package` values of every `../../rules/*.json` that has an android block; `canRetrieveWindowContent == true`; the event types are exactly window-state and window-content changes; `flagReportViewIds` is set.
 
@@ -480,22 +482,22 @@ Instrumented tests, with `ServiceHarness` enabling the service through `uiAutoma
 - `YoutubeShortsTest.aNormalVideoStaysOpen`: with `videoId`, open `https://www.youtube.com/watch?v=<videoId>`, wait 6 s, assert the YouTube package is still in front.
 - `InstagramReelsTest.reelsTabIsClosed` and `InstagramReelsTest.aReelFromADmStaysOpen`: guarded with `assumeTrue` on a signed-in Instagram. The second encodes the decision from Task 3 Step 5, and if that decision was "the broader rule also closes DM reels", it asserts the documented behavior instead.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOfflineDebugUnitTest --tests "*ServiceConfigTest"` (compile error) and, once the harness compiles, `./gradlew connectedOfflineDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.shortsId=<id> -Pandroid.testInstrumentationRunnerArguments.videoId=<id>`. Expected: `shortsPlayerIsClosedWithinThreeSeconds` fails because no service exists. Pick the two ids by opening YouTube search on the emulator: any current Short and any ordinary video.
 
-- [ ] **Step 3: Implement the service**
+- [x] **Step 3: Implement the service**
 
 - Config XML: `accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"`, `accessibilityFlags="flagReportViewIds"`, `canRetrieveWindowContent="true"`, `packageNames="com.instagram.android,com.google.android.youtube"`, `notificationTimeout="100"`, `accessibilityFeedbackType="feedbackGeneric"`, `description="@string/service_description"`. Do not set `isAccessibilityTool`.
 - Manifest: the service with `android.permission.BIND_ACCESSIBILITY_SERVICE`, `exported="true"`, the `android.accessibilityservice` intent filter and the config meta-data.
 - `NodeAdapter`: `children` lazily wraps `getChild(i)`, `viewId` is `viewIdResourceName`, `selected` is `isSelected`. Call `recycle()` on API below 33.
 - `UnscrollService.onAccessibilityEvent`: ignore events whose package is not in `TargetPackages.ALL`, coalesce them with a `Handler(Looper.getMainLooper())` so one evaluation runs 150 ms after the first event of a burst, then read `rootInActiveWindow`, skip when it is `null` or its package differs from the event's, call `Engine.evaluate`, and on `Match(rule, allowed = true)` perform `GLOBAL_ACTION_BACK` or `GLOBAL_ACTION_HOME`. `OVERLAY` is handled in Task 8, so here it only logs. Build the `Engine` with `RuleMatcher()`, `CooldownGate(clock = SystemClock::elapsedRealtime)` and `{ app.rules.current() }`. Keep `instance` set between `onServiceConnected` and `onDestroy`.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOfflineDebugUnitTest`, then `./gradlew connectedOfflineDebugAndroidTest` with the arguments from Step 2. Expected: all pass, and the two Instagram tests are skipped or pass depending on Task 3. Confirm the service is alive with `adb shell dumpsys accessibility | findstr -i unscroll`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add android && git commit -m "feat(android): accessibility service that closes Reels and Shorts"`
 
@@ -517,24 +519,24 @@ Run: `./gradlew testOfflineDebugUnitTest`, then `./gradlew connectedOfflineDebug
   object OverlayPolicy { fun shouldStay(matchPresent: Boolean, foregroundPackage: String?, targets: Set<String>): Boolean }
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `OverlayPolicyTest`: stays when a match is present in a target app, goes when there is no match, goes when `foregroundPackage` is `null` or outside `targets` even if the last match was present.
 `OverlayTest` (instrumented): import a one-off YouTube rule set (same viewId as the shipped Shorts rule, `action: "overlay"`, a newer `version`) through `UnscrollApp.rules.import`, open the Short, assert the overlay window exists (`device.hasObject(By.text(<overlay title string>))`), press Home with `device.pressHome()`, and assert the overlay is gone within 2 s. A second test taps the "Go back" button and asserts the overlay is gone and YouTube is not showing the Shorts player.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOfflineDebugUnitTest --tests "*OverlayPolicyTest"`. Expected: compile error.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 The overlay is a full-screen opaque view (`TYPE_ACCESSIBILITY_OVERLAY`, `FLAG_LAYOUT_IN_SCREEN or FLAG_NOT_FOCUSABLE`) with a short message and one "Go back" button, which runs `onGoBack` (the service performs `GLOBAL_ACTION_BACK`) and hides the view. It is removed in three ways: the button, an evaluation with no match, and a watchdog that runs every second while it is showing and asks `OverlayPolicy.shouldStay` using `rootInActiveWindow?.packageName`. Its job is to remove the overlay when the user leaves the app, because events from other packages never reach the service.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOfflineDebugUnitTest connectedOfflineDebugAndroidTest` with the Task 7 arguments. Expected: all pass. If `rootInActiveWindow` reports the overlay's own window instead of the app's, adjust the watchdog until the Home test passes, and keep that test.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add android && git commit -m "feat(android): full-screen overlay action with watchdog"`
 
@@ -558,18 +560,18 @@ Run: `./gradlew testOfflineDebugUnitTest connectedOfflineDebugAndroidTest` with 
   class SettingsStore(context: Context) { var disclosureAccepted: Boolean; var rulesBaseUrl: String?; var lastRefreshMs: Long }
   ```
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 - `onboardingStep`: not accepted gives `DISCLOSURE` whatever the service state, accepted and disabled gives `ENABLE_SERVICE`, accepted and enabled gives `ACTIVE`.
 - `needsRestrictedSettingsHelp`: SDK 32 gives `false`, SDK 33 with the service off gives `true`, SDK 36 with the service on gives `false`.
 - `isServiceEnabled`: `null` and the empty string give `false`; the short and the full class-name forms both match; a colon-separated list matches when the component is one of the entries; a different service does not match.
 - `TurnOffTest` (instrumented): enable the service through the harness, launch `MainActivity`, tap "Turn off" (found by text), then assert `Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES` no longer lists the component.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOfflineDebugUnitTest --tests "*ui*"`. Expected: compile error.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add Compose Material 3 and the Compose compiler plugin through the version catalog. The screen is driven by `onboardingStep`:
 - `DISCLOSURE`: states, in plain English, that the service (1) only receives events from Instagram and YouTube, (2) reads the structure of the screen (element ids and labels) to see whether a Reels or Shorts screen is showing, (3) acts only by pressing Back or Home or by drawing a "hidden by unscroll" screen, (4) never stores, logs or sends what it reads, (5) in the `online` flavor downloads rule files and nothing else, (6) can be turned off at any time from this app or from system settings. One button, "I understand".
@@ -577,15 +579,15 @@ Add Compose Material 3 and the Compose compiler plugin through the version catal
 - `ACTIVE`: shows that unscroll is on, the active rule set versions from `UnscrollApp.rules.current()` with their `testedVersion`, a "Turn off" button (`UnscrollService.instance?.disableSelf()`, falling back to opening the accessibility settings when `instance` is `null`), and the flavor-specific rules section from Task 10.
 - `service_description` in `strings.xml` is the one-paragraph version of the disclosure, shown by the system under the service name.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `./gradlew testOfflineDebugUnitTest connectedOfflineDebugAndroidTest`. Expected: all pass.
 
-- [ ] **Step 5: Look at it on the emulator**
+- [x] **Step 5: Look at it on the emulator** *(Done with an `adb` install; the install from the Files app was not reproduced, so the greyed-out switch was not seen.)*
 
 Install the debug build, clear the app data (`adb shell pm clear io.github.lucafregona.unscroll`), take a screenshot of each step with `adb exec-out screencap -p > <scratch>\stepN.png` and read the images. Check that nothing is cut off and the text matches the points above. Then copy the APK to `/sdcard/Download`, install it from the emulator's Files app, and check whether the accessibility toggle is greyed out ("restricted setting"). Write down what the emulator showed, because `adb install` is exempt and an install from Files is not. If the restricted flow cannot be reproduced, say so in `android/README.md`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 `git add android && git commit -m "feat(android): disclosure, onboarding and turn off"`
 
@@ -602,31 +604,31 @@ Install the debug build, clear the app data (`adb shell pm clear io.github.lucaf
 - Consumes: `RulesRepository`, `RulesUpdater`, `BaseUrl`, `RefreshPolicy`, `createRulesFetcher`, `SettingsStore`
 - Produces: `@Composable fun RulesSourceSection(app: UnscrollApp)` in both flavors. `UnscrollApp.refreshRulesIfDue(nowMs: Long = System.currentTimeMillis())` is a no-op when `createRulesFetcher()` is `null`, when the stored URL is invalid, or when `RefreshPolicy` says it is not due, and it records `lastRefreshMs` after an attempt.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `RulesRefreshTest`: a small `RulesRefresher(settings, repo, fetcher, clock)` extracted from `UnscrollApp` is tested with fakes: not due means no fetch, due means one fetch per bundled id and `lastRefreshMs` updated, an invalid stored URL means no fetch, failures still update `lastRefreshMs` and leave the rules unchanged, `fetcher == null` means nothing happens.
 `RulesImportTest` (offline instrumented): write a newer `youtube.json` through the same code path the file picker uses and assert `UnscrollApp.rules.current()` reports the new version.
 
-- [ ] **Step 2: Run them and confirm they fail**
+- [x] **Step 2: Run them and confirm they fail**
 
 Run: `./gradlew testOnlineDebugUnitTest --tests "*RulesRefreshTest"`. Expected: compile error.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 - `offline` section: an "Import rules file" button using `ActivityResultContracts.OpenDocument` for `application/json`, reading at most `MAX_RULES_BYTES + 1` bytes, passing the text to `RulesRepository.import` and showing `Stored` or the rejection reason.
 - `online` section: a text field for the base URL (default `BuildConfig.DEFAULT_RULES_BASE_URL`), "Update now" calling `RulesUpdater.refresh` on `Dispatchers.IO` and listing the per-id results, and "Reset to default". Parse with `BaseUrl.parse(input, allowLocalCleartext = BuildConfig.DEBUG)`, and show an inline error for `null`.
 - The debug manifest sets `networkSecurityConfig` to a file permitting cleartext only to `10.0.2.2`. Release builds have no such file.
 - `UnscrollApp.refreshRulesIfDue()` is called from `MainActivity.onResume` and `UnscrollService.onServiceConnected`, off the main thread.
 
-- [ ] **Step 4: Run the unit and instrumented tests**
+- [x] **Step 4: Run the unit and instrumented tests**
 
 Run: `./gradlew testOnlineDebugUnitTest testOfflineDebugUnitTest connectedOfflineDebugAndroidTest`. Expected: all pass.
 
-- [ ] **Step 5: Check the online path end to end on the emulator**
+- [x] **Step 5: Check the online path end to end on the emulator**
 
 Serve the repo's rules: `npx --yes http-server rules -p 8080` (from a different working directory than any downloaded content). Install `installOnlineDebug`, set the URL to `http://10.0.2.2:8080`, edit a copy of `youtube.json` served by that server to a newer `version`, tap "Update now", and confirm the status list shows the new version. Then serve a 404 and an HTML page and confirm the previous rules stay active and an error is shown.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 `git add android && git commit -m "feat(android): rules import, URL setting and automatic refresh"`
 
@@ -641,28 +643,28 @@ Serve the repo's rules: `npx --yes http-server rules -p 8080` (from a different 
 - Consumes: environment variables `UNSCROLL_KEYSTORE_FILE`, `UNSCROLL_KEYSTORE_PASSWORD`, `UNSCROLL_KEY_ALIAS`, `UNSCROLL_KEY_PASSWORD`
 - Produces: Gradle tasks `assembleOfflineRelease` and `assembleOnlineRelease`. A signed release produces `unscroll-<version>-offline.apk` and `unscroll-<version>-online.apk`. Without the variables the release variants stay unsigned.
 
-- [ ] **Step 1: Configure signing and minification**
+- [x] **Step 1: Configure signing and minification**
 
 A `release` signing config built from the four variables, applied only when all are set. Release: `isMinifyEnabled = true`, `isShrinkResources = true`, with keep rules only for what the manifest and reflection need (the service, the application class).
 
-- [ ] **Step 2: Build and verify with a throwaway keystore**
+- [x] **Step 2: Build and verify with a throwaway keystore**
 
 Create a keystore outside the repo with `keytool -genkeypair ... -keystore <scratch>\test.jks`, export the four variables, and run `./gradlew assembleOfflineRelease assembleOnlineRelease`. Verify the signature with `apksigner verify --print-certs <apk>` from the SDK build-tools. Confirm that the offline APK declares no INTERNET permission: `aapt2 dump permissions <apk>`.
 
-- [ ] **Step 3: Test the minified APK on the emulator**
+- [x] **Step 3: Test the minified APK on the emulator**
 
 Install the signed offline release APK, enable the service with the harness commands, and repeat the YouTube Shorts check by hand (or with `connectedOfflineDebugAndroidTest` pointed at the release build if the test APK can be signed accordingly). The Shorts player must close, the app must open, and the disclosure text must show.
 
-- [ ] **Step 4: CI**
+- [x] **Step 4: CI**
 
 In `ci.yml` add an `android` job on `ubuntu-latest`: checkout, Java 21 (Temurin), Gradle setup with caching, and `./gradlew check assembleDebug` in `android/`. It must not need an emulator. Use the latest major of each action, as the existing workflow does.
 In `release.yml` add an `android` job with `needs: release`: decode `secrets.UNSCROLL_KEYSTORE_BASE64` into `$RUNNER_TEMP`, export the other three secrets as the variables above, run `./gradlew assembleOfflineRelease assembleOnlineRelease`, fail unless `apksigner verify` succeeds on both APKs, rename them to `unscroll-<version>-<flavor>.apk`, and attach them with `gh release upload "$GITHUB_REF_NAME" <apks>`. The tag-matches-version check from the existing job also applies.
 
-- [ ] **Step 5: Check what can be checked locally**
+- [x] **Step 5: Check what can be checked locally**
 
 Run `npm run typecheck && npm test` (must be unchanged) and read both workflow files back for syntax. The workflows cannot run without a push, so state in the commit body that they are unrun.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 `git add android .github .gitignore && git commit -m "ci(android): signed release APKs and Android checks"`
 
@@ -673,11 +675,11 @@ Run `npm run typecheck && npm test` (must be unchanged) and read both workflow f
 **Files:**
 - Modify: `android/README.md`, `rules/README.md`, `CONTRIBUTING.md`, `README.md`, `CLAUDE.md`, `ROADMAP.md`, `docs/superpowers/specs/2026-11-03-unscroll-design.md` (§5.3, §7)
 
-- [ ] **Step 1: `android/README.md`** (replace the stub)
+- [x] **Step 1: `android/README.md`** (replace the stub)
 
 Sections: what it does and does not block (a table built from the Task 3 results, including the DM and profile behavior and the Shorts shelf on the home screen); install through Obtainium (add the GitHub repo URL, enable the APK filter, pick `online` or `offline`); enabling the service step by step, including "Allow restricted settings" on Android 13 and later; turning it off; building (`./gradlew assembleOfflineDebug` from `android/`, JDK 21, Android SDK); running the tests, including `connected*AndroidTest` and the instrumentation arguments; the rules fetch layout `<base>/<id>.json` for people who host their own rules; and a **Release checklist** for the maintainer: create the keystore, set the four GitHub secrets, bump `package.json` to `0.2.0`, tag `v0.2.0`, register for Android developer verification before the 2027 global rollout.
 
-- [ ] **Step 2: Other docs**
+- [x] **Step 2: Other docs**
 
 - `rules/README.md`: document `when.selected`, say that conditions all hold on one node, say to prefer `viewId` because `contentDescription` is translated and breaks on phones in another language, and drop "Added in Phase 2".
 - `CONTRIBUTING.md`: in the Android section add the Windows form of the dump commands, the list-of-ids one-liner from Task 3, and "never commit a full dump".
@@ -685,15 +687,15 @@ Sections: what it does and does not block (a table built from the Task 3 results
 - `CLAUDE.md`: under **Commands** add the Gradle commands (run from `android/`: `./gradlew check`, `./gradlew assembleOfflineDebug`, `./gradlew connectedOfflineDebugAndroidTest`), and under **Hard constraints** one sentence saying the no-network rule is for the web client, while the Android `online` flavor may fetch rule files over HTTPS and the app stores only the items in this plan's Global Constraints.
 - Design spec: §5.3 records the fetch layout, the 24-hour refresh and the application id, and §7 gets the numbered calls from this plan.
 
-- [ ] **Step 3: Roadmap**
+- [x] **Step 3: Roadmap**
 
 Tick, in `ROADMAP.md`: the Phase 2 plan, the UI dumps and `android` blocks, the service, the disclosure and onboarding flow, the two flavors, and "Signed APKs ... with Obtainium instructions" only when the pipeline and docs exist. Leave "Register for Android developer verification" unticked.
 
-- [ ] **Step 4: Final verification**
+- [x] **Step 4: Final verification**
 
 Run `npm run typecheck && npm run validate && npm test` from the repo root and `./gradlew check assembleOfflineDebug assembleOnlineDebug` from `android/`. With the emulator running, run `./gradlew connectedOfflineDebugAndroidTest` with the Task 7 arguments. Everything must pass. Read the final state of `git status` to confirm no dumps, keystores or `local.properties` are tracked.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 `git add -A android README.md CONTRIBUTING.md CLAUDE.md ROADMAP.md rules docs && git commit -m "docs: Android client guide and Phase 2 roadmap"`
 
@@ -704,3 +706,15 @@ Run `npm run typecheck && npm run validate && npm test` from the repo root and `
 - **Spec coverage (§5.3):** Kotlin and `minSdk 26` (Task 1); `packageNames` scope, events, Back/Home/overlay, cooldown (Tasks 5, 7, 8); rules as assets (Task 1); both flavors and the fetch layout (Tasks 1, 6, 10); disclosure (Task 9); signed APKs, Obtainium and developer verification (Tasks 11, 12, the last as a maintainer item). The roadmap's seven Phase 2 items map to Plan (this file), Task 3, Tasks 5/7/8, Task 9, Tasks 1/6/10, Tasks 11/12 and Task 12.
 - **Type consistency:** `AndroidRule.selected` is defined in Task 4 and read in Task 5. `Decision.Match.allowed` is defined in Task 5 and read in Tasks 7 and 8. `RulesRepository.import` and `ImportResult` come from Task 6 and are used in Tasks 8, 10. `TargetPackages.ALL` is Task 4 and is used in Tasks 6, 7, 8.
 - **Review Focus:** every item has an owning test (1: Task 3, 2: Tasks 3 and 7, 3: Tasks 4 and 6, 4: Tasks 5, 8, 9, 5: Tasks 5 and 7).
+
+## Deviations from this plan
+
+Decided while executing it on 2026-11-03 and 2026-11-04. Each one has a ruling in the execution ledger.
+
+- **Task 3 is half done.** The YouTube `android` block is written and checked against dumps of the Shorts player and five allowed screens. The Instagram block is not: it needs a signed-in Instagram, and the emulator has no Google account and no Instagram. Its steps stay unticked. When it is done, add `"instagram"` to `androidApps` in `rules/rules.test.ts`, to `shippedWithAndroid` in `RuleSetParserTest`, and an Instagram assertion to `BundledRulesTest`, tighten `ServiceConfigTest.everyPackageWithShippedAndroidRulesIsInScope` to equality, and write `InstagramReelsTest`.
+- **Versions.** AGP 9.5.0 (Kotlin is built in), Gradle 9.8.2 with its checksum pinned, Kotlin 2.4.21 (it comes in through the Compose compiler plugin declared in the root build, because AGP 9.5's own Kotlin is 2.2.0), Compose BOM 2026.09.00. `compileSdk` is 37, not 36, because current Compose requires it; `targetSdk` stays 36.
+- **Instrumented tests.** UiAutomation must be told not to suppress other accessibility services (`Configurator.uiAutomationFlags`), and the harness drives apps through the shell because `getLaunchIntentForPackage` cannot see other packages from the test context. The YouTube tests open Shorts through the bottom-bar tab instead of a `shortsId` deep link, and `shortsPlayerIsClosedWithinThreeSeconds` became `shortsPlayerIsClosed` with an 8 second window.
+- **Small additions.** `RulesRepository.resetStored()`, `RulesRepository.importStream()`, `RulesRefresher` with a `RefreshSettings` interface, `UnscrollApp.refreshRulesInBackground(onFinished)`, `TargetPackages.displayName()`, `RulesSourceSection(app, onRulesChanged)`, `.gitattributes`, and `gradlew` recorded as executable.
+- **Lint.** `UseKtx` is disabled on purpose. `res/mipmap-anydpi-v26` keeps its name because renaming it breaks resource linking.
+
+Not done, and said so in `android/README.md` and `ROADMAP.md`: the Instagram rules, a run on a physical phone, the greyed-out restricted-settings switch, a run of the GitHub workflows, the real signing key, the version bump and tag, and the developer verification.

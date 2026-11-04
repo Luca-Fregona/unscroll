@@ -7,7 +7,7 @@
 - **Community rules.** When an app changes its layout, one small rule fix updates every client.
 - **You stay in control.** Turning unscroll off is always one tap away.
 
-> **Status:** pre-alpha. The web client (Phase 1) is built and waiting for its first release. See the [roadmap](ROADMAP.md).
+> **Status:** pre-alpha. The web client (Phase 1) is built and waiting for its first release. The Android client (Phase 2) closes YouTube Shorts on an emulator and is still waiting for its Instagram rules. See the [roadmap](ROADMAP.md).
 
 ## How it works
 
@@ -24,7 +24,7 @@ The **rules** describe where the short-video feeds live: CSS selectors and URL r
 | iPhone / iPad | Safari plus the free *Userscripts* extension, using instagram.com and m.youtube.com | Phase 1 |
 | Desktop | Violentmonkey or Tampermonkey | Phase 1 |
 | Android, websites | Firefox plus Violentmonkey | Phase 1 |
-| Android, official apps | unscroll app (accessibility service), sideloaded from GitHub Releases | Phase 2 |
+| Android, official apps | unscroll app (accessibility service), sideloaded from GitHub Releases. See [`android/README.md`](android/README.md) | Phase 2: YouTube Shorts done, Instagram Reels pending |
 
 **Why not the iPhone apps themselves?** iOS does not let any app look inside another app. Screen Time can only block a whole app, so every "block Reels on iPhone" product works through the website. unscroll does the same, openly and for free.
 

@@ -21,11 +21,12 @@ Plan: [`2026-11-03-phase-1-rules-and-userscripts.md`](docs/superpowers/plans/202
 ## Phase 2: Android client → v0.2
 Plan: [`2026-11-03-phase-2-android-client.md`](docs/superpowers/plans/2026-11-03-phase-2-android-client.md)
 - [x] Write the Phase 2 plan
-- [ ] Dump the UI trees of Instagram and YouTube (`adb shell uiautomator dump`) and write the `android` blocks in the rule sets
-- [ ] Kotlin `AccessibilityService` scoped to the target packages: Back, Home, overlay, cooldown
-- [ ] In-app disclosure screen, and an onboarding flow for Android 13+ restricted settings
-- [ ] `offline` and `online` flavors (rules from a user-configurable URL)
-- [ ] Signed APKs on GitHub Releases, with Obtainium instructions
+- [ ] Dump the UI trees of Instagram and YouTube (`adb shell uiautomator dump`) and write the `android` blocks in the rule sets (YouTube done on an emulator; Instagram needs a signed-in Instagram, so its dump is still to take)
+- [x] Kotlin `AccessibilityService` scoped to the target packages: Back, Home, overlay, cooldown
+- [x] In-app disclosure screen, and an onboarding flow for Android 13+ restricted settings (the greyed-out switch itself was not seen on the emulator)
+- [x] `offline` and `online` flavors (rules from a user-configurable URL)
+- [x] Signed APKs on GitHub Releases, with Obtainium instructions (pipeline and instructions written and checked locally; the workflow has not run on GitHub and needs the four signing secrets)
+- [ ] Check the Android app on a physical phone
 - [ ] Register for Android developer verification before the 2027 global rollout
 
 ## Phase 3: Coverage and maintenance
