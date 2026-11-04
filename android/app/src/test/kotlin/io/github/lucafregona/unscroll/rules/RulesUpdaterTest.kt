@@ -84,6 +84,27 @@ class RulesUpdaterTest {
     }
 
     @Test
+    fun aFetcherThatThrowsSomethingUnexpectedFails() {
+        fetcher.responses += base.fileUrl("youtube") to { throw IllegalStateException("boom") }
+        assertTrue(updater.refresh(base).single { it.id == "youtube" } is RefreshResult.Failed)
+    }
+
+    @Test
+    fun aFailureWhileStoringFailsInsteadOfThrowing() {
+        val brokenRepo = RulesRepository(listOf(ruleSetJson("youtube", YOUTUBE)), folder.newFile("blocked"))
+        val brokenFetcher = FakeFetcher(mapOf(base.fileUrl("youtube") to { ruleSetJson("youtube", YOUTUBE, version = "2026.12.01") }))
+        assertTrue(RulesUpdater(brokenRepo, brokenFetcher).refresh(base).single() is RefreshResult.Failed)
+    }
+
+    @Test
+    fun aFileForAnotherPackageFails() {
+        serve("instagram", ruleSetJson("instagram", YOUTUBE, version = "2030.01.01", testedVersion = "fetched"))
+        val result = updater.refresh(base).single { it.id == "instagram" }
+        assertTrue(result.toString(), result is RefreshResult.Failed)
+        assertEquals(listOf("bundled", "bundled"), repo.current().map { it.testedVersion })
+    }
+
+    @Test
     fun oneFailureDoesNotStopTheOthers() {
         fetcher.responses += base.fileUrl("instagram") to { throw IOException("boom") }
         serve("youtube", ruleSetJson("youtube", YOUTUBE, version = "2026.12.01", testedVersion = "fetched"))

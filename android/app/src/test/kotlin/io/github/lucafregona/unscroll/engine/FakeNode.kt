@@ -3,11 +3,12 @@ package io.github.lucafregona.unscroll.engine
 import io.github.lucafregona.unscroll.rules.AndroidRule
 import io.github.lucafregona.unscroll.rules.RuleAction
 
-/** A node of a fake accessibility tree. [viewIdReads] counts how often the matcher looked at it. */
+/** A node of a fake accessibility tree. [onViewIdRead] is called every time the matcher looks at its id. */
 class FakeNode(
     viewId: String? = null,
     override val contentDescription: String? = null,
     override val selected: Boolean = false,
+    override val visible: Boolean = true,
     kids: List<UiNode> = emptyList(),
     private val onViewIdRead: () -> Unit = {},
 ) : UiNode {

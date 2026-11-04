@@ -110,7 +110,11 @@ private fun EnableService(showRestrictedHelp: Boolean, onOpenSettings: () -> Uni
 @Composable
 private fun Active(ruleSets: List<AndroidRuleSet>, onTurnOff: () -> Unit, rulesSection: @Composable () -> Unit) {
     Title(stringResource(R.string.active_title))
-    Text(stringResource(R.string.active_body), style = MaterialTheme.typography.bodyLarge)
+    val apps = coveredAppNames(ruleSets)
+    Text(
+        if (apps.isEmpty()) stringResource(R.string.active_body_none) else stringResource(R.string.active_body, apps.joinToString(", ")),
+        style = MaterialTheme.typography.bodyLarge,
+    )
     Text(stringResource(R.string.rules_in_use), style = MaterialTheme.typography.titleMedium)
     ruleSets.forEach { ruleSet ->
         Text(

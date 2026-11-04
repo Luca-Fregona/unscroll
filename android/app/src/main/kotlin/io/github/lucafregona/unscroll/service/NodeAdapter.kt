@@ -25,6 +25,7 @@ class NodeAdapter(private val node: AccessibilityNodeInfo, private val tree: Nod
     override val viewId: String? get() = node.viewIdResourceName
     override val contentDescription: String? get() = node.contentDescription?.toString()
     override val selected: Boolean get() = node.isSelected
+    override val visible: Boolean get() = node.isVisibleToUser
 
     override val children: Sequence<UiNode>
         get() = sequence {

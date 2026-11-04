@@ -115,6 +115,32 @@ class RulesRepositoryTest {
     }
 
     @Test
+    fun importFailsCleanlyWhenTheStoreCannotBeWritten() {
+        val blocked = RulesRepository(bundled, folder.newFile("a-file-where-the-folder-should-be"))
+        val result = blocked.import(ruleSetJson("youtube", YOUTUBE, version = "2026.12.01"))
+        assertTrue(result.toString(), result is ImportResult.Rejected)
+        assertEquals("bundled", blocked.current().single { it.id == "youtube" }.testedVersion)
+    }
+
+    @Test
+    fun twoStoredRuleSetsForOnePackageCompeteByVersion() {
+        plant("aaa.json", ruleSetJson("aaa", YOUTUBE, version = "2026.12.01", testedVersion = "aaa-newer"))
+        assertEquals(listOf("aaa-newer"), repo.current().filter { it.packageName == YOUTUBE }.map { it.testedVersion })
+    }
+
+    @Test
+    fun anOlderRuleSetForTheSamePackageLoses() {
+        plant("aaa.json", ruleSetJson("aaa", YOUTUBE, version = "2026.01.01", testedVersion = "aaa-older"))
+        assertEquals(listOf("bundled"), repo.current().filter { it.packageName == YOUTUBE }.map { it.testedVersion })
+    }
+
+    @Test
+    fun theBundledPackageOfAnIdIsKnown() {
+        assertEquals(YOUTUBE, repo.bundledPackage("youtube"))
+        assertEquals(null, repo.bundledPackage("tiktok"))
+    }
+
+    @Test
     fun anImportedRuleSetSurvivesANewRepository() {
         repo.import(ruleSetJson("youtube", YOUTUBE, version = "2026.12.01", testedVersion = "imported"))
         assertEquals("imported", RulesRepository(bundled, store).youtube().testedVersion)

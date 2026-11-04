@@ -1,6 +1,7 @@
 package io.github.lucafregona.unscroll.rules
 
 import java.io.File
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
@@ -33,6 +34,9 @@ class RulesRepository(bundledJson: List<String>, private val storeDir: File) {
     /** Ids of the rule sets that ship with the app. These are the ones the `online` flavor refreshes. */
     fun bundledIds(): List<String> = bundled.map { it.id }.sorted()
 
+    /** The package the bundled rule set with this id is for, or null if there is none. */
+    fun bundledPackage(id: String): String? = bundled.firstOrNull { it.id == id }?.packageName
+
     fun current(): List<AndroidRuleSet> = cache ?: synchronized(this) { cache ?: load().also { cache = it } }
 
     /** Validates [json] and, if it is acceptable, stores it as `<id>.json`. Nothing is written otherwise. */
@@ -50,10 +54,15 @@ class RulesRepository(bundledJson: List<String>, private val storeDir: File) {
             return ImportResult.Rejected("unscroll does not act in ${ruleSet.packageName}")
         }
 
-        storeDir.mkdirs()
         val temp = File(storeDir, "${ruleSet.id}.json.tmp")
-        temp.writeText(json, StandardCharsets.UTF_8)
-        Files.move(temp.toPath(), File(storeDir, "${ruleSet.id}.json").toPath(), StandardCopyOption.ATOMIC_MOVE)
+        try {
+            storeDir.mkdirs()
+            temp.writeText(json, StandardCharsets.UTF_8)
+            Files.move(temp.toPath(), File(storeDir, "${ruleSet.id}.json").toPath(), StandardCopyOption.ATOMIC_MOVE)
+        } catch (e: IOException) {
+            temp.delete()
+            return ImportResult.Rejected("the rule file could not be saved: ${e.message ?: "unknown error"}")
+        }
         cache = null
         return ImportResult.Stored(ruleSet.id, ruleSet.version)
     }
@@ -67,8 +76,9 @@ class RulesRepository(bundledJson: List<String>, private val storeDir: File) {
 
     private fun load(): List<AndroidRuleSet> {
         val candidates = bundled.map { it to false } + stored().map { it to true }
-        return candidates.groupBy { (ruleSet, _) -> ruleSet.id }.values
-            .map { group -> group.maxWith(compareBy({ it.first.version }, { it.second })).first }
+        // One winner per app: the engine looks rules up by package, so two rule sets for one package must not coexist.
+        return candidates.groupBy { (ruleSet, _) -> ruleSet.packageName }.values
+            .map { group -> group.maxWith(compareBy<Pair<AndroidRuleSet, Boolean>>({ it.first.version }, { it.second }, { it.first.id })).first }
             .sortedBy { it.id }
     }
 

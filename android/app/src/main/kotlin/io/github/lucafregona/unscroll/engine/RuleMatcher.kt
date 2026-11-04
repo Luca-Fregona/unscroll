@@ -4,8 +4,10 @@ import io.github.lucafregona.unscroll.rules.AndroidRule
 
 /**
  * Finds the first rule, in list order, that holds on some node of a window. A rule holds on a node when
- * every condition it sets holds on that same node. The traversal looks at no more than [maxNodes] nodes, so
- * a huge tree cannot make the service burn CPU.
+ * every condition it sets holds on that same node. Only nodes the user can see take part, the same ones that
+ * `uiautomator dump` shows and rules are written from, and a hidden node hides its whole subtree. The
+ * traversal looks at no more than [maxNodes] nodes, and never asks for more children than that budget could
+ * still use, so a huge tree cannot make the service burn CPU.
  */
 class RuleMatcher(private val maxNodes: Int = 2_000) {
     fun firstMatch(rules: List<AndroidRule>, root: UiNode): AndroidRule? {
@@ -17,11 +19,12 @@ class RuleMatcher(private val maxNodes: Int = 2_000) {
         while (pending.isNotEmpty() && visited < maxNodes) {
             val node = pending.removeLast()
             visited++
+            if (!node.visible) continue
             for (i in rules.indices) {
                 if (!matched[i] && rules[i].holdsOn(node)) matched[i] = true
             }
             if (matched[0]) break // nothing can outrank the first rule
-            if (visited < maxNodes) node.children.toList().asReversed().forEach(pending::addLast)
+            if (visited < maxNodes) node.children.take(maxNodes - visited).toList().asReversed().forEach(pending::addLast)
         }
         return rules.indices.firstOrNull { matched[it] }?.let(rules::get)
     }

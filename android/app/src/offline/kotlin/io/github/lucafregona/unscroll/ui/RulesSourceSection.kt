@@ -40,7 +40,11 @@ fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
             val result = withContext(Dispatchers.IO) {
-                context.contentResolver.openInputStream(uri)?.let { app.rules.importStream(it) }
+                try {
+                    context.contentResolver.openInputStream(uri)?.let { app.rules.importStream(it) }
+                } catch (e: Exception) {
+                    null // a revoked grant, a cloud file that is gone: shown as "could not be opened"
+                }
             }
             message = when (result) {
                 is ImportResult.Stored -> resources.getString(R.string.import_stored, result.id, result.version)

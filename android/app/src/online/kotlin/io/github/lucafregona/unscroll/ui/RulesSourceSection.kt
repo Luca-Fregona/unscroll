@@ -23,6 +23,7 @@ import io.github.lucafregona.unscroll.R
 import io.github.lucafregona.unscroll.UnscrollApp
 import io.github.lucafregona.unscroll.rules.BaseUrl
 import io.github.lucafregona.unscroll.rules.RefreshResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,7 +62,13 @@ fun RulesSourceSection(app: UnscrollApp, onRulesChanged: () -> Unit) {
                 app.settings.rulesBaseUrl = typed.takeUnless { it == BuildConfig.DEFAULT_RULES_BASE_URL }
                 busy = true
                 scope.launch {
-                    val results = withContext(Dispatchers.IO) { app.refresher.refreshNow() }
+                    val results = try {
+                        withContext(Dispatchers.IO) { app.refresher.refreshNow() }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        listOf(RefreshResult.Failed("rules", e.message ?: e.javaClass.simpleName))
+                    }
                     status = results.map(::describe)
                     busy = false
                     onRulesChanged()

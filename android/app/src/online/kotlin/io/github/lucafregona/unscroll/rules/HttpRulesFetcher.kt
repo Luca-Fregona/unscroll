@@ -5,12 +5,14 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** A plain HTTP GET with timeouts, no redirects and a size limit. It sends no cookies, headers or identifiers. */
+/** A plain HTTP GET with timeouts, no redirects and a size limit. It sends no cookies and no identifiers: its User-Agent is just "unscroll". */
 class HttpRulesFetcher : RulesFetcher {
     override fun get(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.requestMethod = "GET"
+            // Not the Android default, which carries the OS version and the device model.
+            connection.setRequestProperty("User-Agent", "unscroll")
             connection.instanceFollowRedirects = false
             connection.connectTimeout = TIMEOUT_MS
             connection.readTimeout = TIMEOUT_MS

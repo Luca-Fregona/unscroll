@@ -36,5 +36,13 @@ class ImportStreamTest {
     }
 
     @Test
+    fun aStreamThatFailsIsRejected() {
+        val broken = object : java.io.InputStream() {
+            override fun read(): Int = throw java.io.IOException("the disk went away")
+        }
+        assertTrue(repo.importStream(broken) is ImportResult.Rejected)
+    }
+
+    @Test
     fun garbageIsRejected() = assertTrue(repo.importStream(stream("\u0000\u0001 not json")) is ImportResult.Rejected)
 }

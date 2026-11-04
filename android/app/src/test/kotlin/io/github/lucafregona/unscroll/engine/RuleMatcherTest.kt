@@ -74,6 +74,37 @@ class RuleMatcherTest {
     }
 
     @Test
+    fun aNodeTheUserCannotSeeDoesNotMatch() {
+        val tree = FakeNode(kids = listOf(FakeNode(viewId = "app:id/pager", visible = false)))
+        assertNull(matcher.firstMatch(listOf(rule("r", viewId = "app:id/pager")), tree))
+    }
+
+    @Test
+    fun aHiddenSubtreeIsNotSearched() {
+        val hidden = FakeNode(visible = false, kids = listOf(FakeNode(viewId = "app:id/pager")))
+        assertNull(matcher.firstMatch(listOf(rule("r", viewId = "app:id/pager")), FakeNode(kids = listOf(hidden))))
+    }
+
+    @Test
+    fun doesNotFetchMoreChildrenThanTheBudgetAllows() {
+        var fetched = 0
+        val root = object : UiNode {
+            override val viewId: String? = null
+            override val contentDescription: String? = null
+            override val selected = false
+            override val visible = true
+            override val children: Sequence<UiNode> = sequence {
+                for (i in 0 until 5_000) {
+                    fetched++
+                    yield(FakeNode(viewId = "app:id/n$i"))
+                }
+            }
+        }
+        RuleMatcher(maxNodes = 100).firstMatch(listOf(rule("r", viewId = "app:id/none")), root)
+        assertTrue("fetched $fetched children", fetched <= 100)
+    }
+
+    @Test
     fun aMatchInsideTheBudgetIsFound() {
         val kids = (0 until 5_000).map { i -> FakeNode(viewId = if (i == 1_000) "app:id/pager" else "app:id/n$i") }
         val r = rule("r", viewId = "app:id/pager")

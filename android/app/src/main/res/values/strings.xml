@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">unscroll</string>
-    <string name="service_description">Closes the Reels and Shorts screens of Instagram and YouTube by pressing Back. It only receives events from those two apps, reads element ids and labels to recognize those screens, and never stores or sends anything. Turn it off here at any time.</string>
+    <string name="service_description">Closes the Reels and Shorts screens of Instagram and YouTube when its rules cover them, by pressing Back or Home or by covering the screen. It only receives events from those two apps, reads element ids and labels to recognize those screens, and never stores or sends anything. Turn it off here at any time.</string>
 
     <string name="overlay_title">Hidden by unscroll</string>
     <string name="overlay_body">This is a Reels or Shorts screen.</string>
@@ -9,7 +9,7 @@
 
     <string name="disclosure_title">Before you turn unscroll on</string>
     <string name="disclosure_intro">unscroll closes Reels and Shorts. To do that it uses Android\'s accessibility service. This is exactly what that means:</string>
-    <string name="disclosure_scope">It only receives events from Instagram and YouTube. Every other app is invisible to it.</string>
+    <string name="disclosure_scope">It only receives events from Instagram and YouTube. Events from every other app never reach it.</string>
     <string name="disclosure_reads">In those two apps it reads the structure of the screen (element ids and labels) to tell whether a Reels or Shorts screen is showing.</string>
     <string name="disclosure_acts">It acts only by pressing Back or Home, or by covering the screen with a \"Hidden by unscroll\" view.</string>
     <string name="disclosure_privacy">It never stores, logs or sends what it reads. There is no account, no analytics and no tracking.</string>
@@ -24,7 +24,8 @@
     <string name="restricted_open_app_info">Open app info</string>
 
     <string name="active_title">unscroll is on</string>
-    <string name="active_body">Reels and Shorts are closed in Instagram and YouTube.</string>
+    <string name="active_body">Reels and Shorts are closed in: %1$s.</string>
+    <string name="active_body_none">No rules are loaded, so nothing is being closed.</string>
     <string name="rules_in_use">Rules in use</string>
     <string name="rule_set_line">%1$s: rules %2$s, tested with %3$s</string>
     <string name="turn_off">Turn off</string>

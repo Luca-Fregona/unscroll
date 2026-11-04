@@ -20,6 +20,7 @@ class EngineTest {
         override val viewId: String? get() = error("the tree of another app must not be read")
         override val contentDescription: String? get() = error("the tree of another app must not be read")
         override val selected: Boolean get() = error("the tree of another app must not be read")
+        override val visible: Boolean get() = error("the tree of another app must not be read")
         override val children: Sequence<UiNode> get() = error("the tree of another app must not be read")
     }
 

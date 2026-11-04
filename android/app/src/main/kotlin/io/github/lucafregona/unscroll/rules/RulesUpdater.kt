@@ -1,7 +1,5 @@
 package io.github.lucafregona.unscroll.rules
 
-import java.io.IOException
-
 sealed interface RefreshResult {
     val id: String
 
@@ -15,16 +13,23 @@ class RulesUpdater(private val repo: RulesRepository, private val fetcher: Rules
     fun refresh(base: BaseUrl): List<RefreshResult> = repo.bundledIds().map { refreshOne(base, it) }
 
     private fun refreshOne(base: BaseUrl, id: String): RefreshResult {
+        // Whatever goes wrong with one file must not take the process down: it runs in the app that hosts the service.
         val body = try {
             fetcher.get(base.fileUrl(id))
-        } catch (e: IOException) {
-            return RefreshResult.Failed(id, e.message ?: "network error")
+        } catch (e: Exception) {
+            return RefreshResult.Failed(id, e.message ?: e.javaClass.simpleName)
         }
 
-        // A file served under the wrong name must not be stored as another rule set.
+        // A file served under the wrong name, or for another app, must not end up as the rules of this one.
         val parsed = RuleSetParser.parse(body)
-        if (parsed is ParseResult.Ok && parsed.ruleSet.id != id) {
-            return RefreshResult.Failed(id, "the file describes \"${parsed.ruleSet.id}\", not \"$id\"")
+        if (parsed is ParseResult.Ok) {
+            if (parsed.ruleSet.id != id) {
+                return RefreshResult.Failed(id, "the file describes \"${parsed.ruleSet.id}\", not \"$id\"")
+            }
+            val expected = repo.bundledPackage(id)
+            if (parsed.ruleSet.packageName != expected) {
+                return RefreshResult.Failed(id, "the file is for ${parsed.ruleSet.packageName}, not for $expected")
+            }
         }
 
         val before = repo.current().firstOrNull { it.id == id }?.version

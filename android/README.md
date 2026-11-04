@@ -9,16 +9,17 @@ An app with one job: an accessibility service that closes the Reels and Shorts s
 | App | Screen | Result |
 |---|---|---|
 | YouTube | The Shorts player (the Shorts tab) | Closed with Back. **Verified.** |
-| YouTube | A Short opened from a shelf on the home screen or from a link | It opens the same player, so the same rules apply. Not verified one by one. |
+| YouTube | A Short opened from a shelf on the home screen or from a link, including one a friend sent | It opens the same player, so it is closed too. Not verified one by one. |
 | YouTube | Home, search, subscriptions, a normal video | Untouched. **Verified.** |
 | Instagram | Reels | Not shipped yet, see the status above. |
-| Any other app | | Invisible to the service. |
+| Any other app | | Its events never reach the service. After an event from Instagram or YouTube the service only looks at which app is in front. |
 
 How it works, in short:
 
 - The service is scoped to `com.instagram.android` and `com.google.android.youtube` in `res/xml/accessibility_service_config.xml`, so Android only delivers events from those two apps.
 - After a burst of events it reads the node tree of the window in front (resource ids and labels, never text typed by the user) and checks it against the rules. A rule matches when **all** its conditions hold on one node.
-- On a match it presses Back or Home, or covers the screen with a "Hidden by unscroll" view that has a Go back button. A cooldown allows at most one action per second and three per ten seconds, so it can never loop.
+- On a match it presses Back or Home, or covers the screen with a "Hidden by unscroll" view that has a Go back button. A cooldown allows at most one Back or Home per second and three per ten seconds, so a screen that stays matched is retried slowly instead of in a storm. The user can always leave the app or tap Turn off.
+- Only nodes the user can see take part in a match, the same ones `uiautomator dump` shows, so a rule written from a dump cannot fire on something hidden.
 - Rules are written against `viewId`, not against visible text, so they keep working when the phone is not set to English.
 
 ## Install
@@ -52,7 +53,7 @@ Tap **Turn off** on the main screen, or switch unscroll off in the system access
 
 ## What the app stores
 
-Only: whether you read the disclosure, the rules address you typed, the time of the last rules refresh, and the rule files you imported or the `online` version downloaded. Backups are switched off. There is no account, no analytics and no crash reporting. The only network request, in the `online` version, is an HTTPS GET of a rule file: no cookies, no identifiers, no redirects, at most 256 KiB.
+Only: whether you read the disclosure, the rules address you typed, the time of the last rules refresh, and the rule files you imported or the `online` version downloaded. Backups are switched off. There is no account, no analytics and no crash reporting. The only network request, in the `online` version, is an HTTPS GET of a rule file: no cookies, no identifiers (its User-Agent is just `unscroll`), no redirects, at most 256 KiB.
 
 ## Host your own rules
 

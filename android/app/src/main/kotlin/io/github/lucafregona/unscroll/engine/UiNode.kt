@@ -5,5 +5,6 @@ interface UiNode {
     val viewId: String?
     val contentDescription: String?
     val selected: Boolean
+    val visible: Boolean
     val children: Sequence<UiNode>
 }

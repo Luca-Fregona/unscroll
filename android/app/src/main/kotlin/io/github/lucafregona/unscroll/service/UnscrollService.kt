@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityEvent
 import io.github.lucafregona.unscroll.UnscrollApp
 import io.github.lucafregona.unscroll.engine.CooldownGate
 import io.github.lucafregona.unscroll.engine.Decision
+import io.github.lucafregona.unscroll.engine.EvaluationPacer
 import io.github.lucafregona.unscroll.engine.Engine
 import io.github.lucafregona.unscroll.engine.RuleMatcher
 import io.github.lucafregona.unscroll.rules.RuleAction
@@ -24,6 +25,7 @@ import io.github.lucafregona.unscroll.rules.TargetPackages
 class UnscrollService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private var evaluationScheduled = false
+    private val pacer = EvaluationPacer()
     private var pendingPackage: String? = null
     private lateinit var engine: Engine
     private val overlay: OverlayController by lazy { OverlayController(this, ::goBackFromOverlay) }
@@ -43,7 +45,7 @@ class UnscrollService : AccessibilityService() {
         pendingPackage = packageName
         if (!evaluationScheduled) {
             evaluationScheduled = true
-            handler.postDelayed(::evaluate, EVALUATION_DELAY_MS)
+            handler.postDelayed(::evaluate, pacer.delayUntilNextRun(SystemClock.elapsedRealtime()))
         }
     }
 
@@ -70,6 +72,7 @@ class UnscrollService : AccessibilityService() {
 
     private fun evaluate() {
         evaluationScheduled = false
+        pacer.markRun(SystemClock.elapsedRealtime())
         val packageName = pendingPackage ?: return
         val root = rootInActiveWindow ?: return
         val tree = NodeTree(root)
@@ -129,7 +132,6 @@ class UnscrollService : AccessibilityService() {
 
     companion object {
         private const val TAG = "unscroll"
-        private const val EVALUATION_DELAY_MS = 150L
         private const val WATCHDOG_MS = 1_000L
 
         /** The connected service, so the app can turn it off. Set between connect and unbind. */

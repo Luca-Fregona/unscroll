@@ -1,6 +1,7 @@
 package io.github.lucafregona.unscroll.rules
 
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.nio.charset.CharacterCodingException
 import java.nio.charset.CodingErrorAction
@@ -14,13 +15,17 @@ import java.nio.ByteBuffer
 fun RulesRepository.importStream(input: InputStream): ImportResult {
     val body = ByteArrayOutputStream()
     val buffer = ByteArray(8_192)
-    input.use { stream ->
-        while (body.size() <= MAX_RULES_BYTES) {
-            val wanted = minOf(buffer.size, MAX_RULES_BYTES + 1 - body.size())
-            val read = stream.read(buffer, 0, wanted)
-            if (read < 0) break
-            body.write(buffer, 0, read)
+    try {
+        input.use { stream ->
+            while (body.size() <= MAX_RULES_BYTES) {
+                val wanted = minOf(buffer.size, MAX_RULES_BYTES + 1 - body.size())
+                val read = stream.read(buffer, 0, wanted)
+                if (read < 0) break
+                body.write(buffer, 0, read)
+            }
         }
+    } catch (e: IOException) {
+        return ImportResult.Rejected("the file could not be read: ${e.message ?: "unknown error"}")
     }
     if (body.size() > MAX_RULES_BYTES) return ImportResult.Rejected("the file is larger than ${MAX_RULES_BYTES / 1024} KiB")
     val text = try {

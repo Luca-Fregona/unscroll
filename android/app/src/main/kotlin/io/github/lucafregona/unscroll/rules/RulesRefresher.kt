@@ -31,8 +31,11 @@ class RulesRefresher(
     fun refreshNow(): List<RefreshResult> {
         val fetcher = fetcher ?: return emptyList()
         val base = baseUrl() ?: return emptyList()
-        val results = RulesUpdater(repo, fetcher).refresh(base)
-        settings.lastRefreshMs = clock()
-        return results
+        // The attempt counts even if something blows up, so a failure cannot repeat on every start of the app.
+        return try {
+            RulesUpdater(repo, fetcher).refresh(base)
+        } finally {
+            settings.lastRefreshMs = clock()
+        }
     }
 }

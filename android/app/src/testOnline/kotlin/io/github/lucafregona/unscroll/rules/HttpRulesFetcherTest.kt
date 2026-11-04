@@ -19,6 +19,7 @@ class HttpRulesFetcherTest {
             ex.responseHeaders.add("Location", "/ok")
             ex.respond(302, "")
         }
+        createContext("/agent") { ex -> ex.respond(200, ex.requestHeaders.getFirst("User-Agent") ?: "none") }
         createContext("/huge") { ex -> ex.respond(200, "x".repeat(MAX_RULES_BYTES + 1)) }
         createContext("/limit") { ex -> ex.respond(200, "x".repeat(MAX_RULES_BYTES)) }
         start()
@@ -45,6 +46,7 @@ class HttpRulesFetcherTest {
     }
 
     @Test fun a200ReturnsTheBody() = assertEquals("hello rules", fetcher.get(url("/ok")))
+    @Test fun itIdentifiesItselfAsUnscrollAndNothingMore() = assertEquals("unscroll", fetcher.get(url("/agent")))
     @Test fun a404Throws() = assertFails("/missing")
     @Test fun aRedirectIsNotFollowed() = assertFails("/redirect")
     @Test fun aBodyAboveTheLimitThrows() = assertFails("/huge")

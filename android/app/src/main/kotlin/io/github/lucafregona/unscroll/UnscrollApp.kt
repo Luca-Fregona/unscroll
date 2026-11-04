@@ -3,6 +3,7 @@ package io.github.lucafregona.unscroll
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.github.lucafregona.unscroll.rules.RulesRefresher
 import io.github.lucafregona.unscroll.rules.RulesRepository
 import io.github.lucafregona.unscroll.rules.createRulesFetcher
@@ -38,6 +39,9 @@ class UnscrollApp : Application() {
         thread(name = "unscroll-rules-refresh") {
             try {
                 refresher.refreshIfDue()
+            } catch (e: Exception) {
+                // A failed refresh must never take down the process that hosts the service.
+                Log.w("unscroll", "rules refresh failed: ${e.javaClass.simpleName}")
             } finally {
                 refreshing.set(false)
                 Handler(Looper.getMainLooper()).post(onFinished)
